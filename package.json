@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/rstock-co/tinyapp/issues"
   },
-  "homepage": "https://github.com/rstock-co/tinyapp#readme"
+  "homepage": "https://github.com/rstock-co/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
 }
