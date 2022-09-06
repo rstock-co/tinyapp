@@ -2,7 +2,10 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
-const generateRandomString = (numChars, stringLength) => Math.random().toString(numChars).substring(3,stringLength + 3);
+const generateRandomString = (numChars, stringLength) =>
+  Math.random()
+    .toString(numChars)
+    .substring(3, stringLength + 3);
 
 app.set("view engine", "ejs");
 
@@ -24,8 +27,20 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  // create a new URL object
+  const newURL = req.body;
+  console.log(newURL);
+
+  // generate a UID for the new URL
+  newURL.id = generateRandomString(36, 6);
+  console.log(newURL.id);
+
+  // add the new URL to our database
+  urlDatabase[newURL.id] = newURL.longURL;
+  console.log(urlDatabase);
+
+  // ask the browser to redirect to the 'urls/:id' route to display the new URL
+  res.redirect(`/urls/${newURL.id}`);
 });
 
 app.get("/urls/new", (req, res) => {
