@@ -1,4 +1,5 @@
 const express = require("express");
+const morgan = require('morgan');
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -11,6 +12,9 @@ app.set("view engine", "ejs");
 
 // middleware to parse POST request body
 app.use(express.urlencoded({ extended: true }));
+
+// middleware to log HTTP requests in terminal
+app.use(morgan('dev'));
 
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
