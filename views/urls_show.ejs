@@ -16,22 +16,24 @@
     <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
-        <h5 class="card-title">TinyURL for: <%= longURL %></h5>
+        <h4 class="card-title"><b>TinyURL for: <%= longURL %></b></h4>
         <p class="card-text">
           Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
         </p>
       </div>
 
-      <div class="card-body">
-        <h5 class="card-title">Edit</h5>
-        <form action="/urls" method="POST">
-          <label>New URL:</label>
-          <input name="name" />
-          <button type="submit">Create</button>
-        </form>
+     
+      <div class="card-footer text-muted">
+        <div class="card-body">
+          <h4 class="card-title"><b>Edit</b></h4>
+          <form action="/urls" method="POST">
+            <label>New URL:</label>
+            <input name="name" />
+            <button type="submit">Create</button>
+          </form>
+        </div>
+  
       </div>
-
-      <div class="card-footer text-muted"></div>
     </div>
     <!-- Bootstrap JS -->
     <script
