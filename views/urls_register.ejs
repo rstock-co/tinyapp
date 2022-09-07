@@ -19,7 +19,7 @@
   </head>
 
   <body>
-    <%- include('partials/_header',{username});  %>
+    <%- include('partials/_header',{users, cookie});  %>
 
     <main style="margin: 1em;">
       <h3>User Registration</h3>
@@ -54,24 +54,3 @@
     ></script>
   </body>
 </html>
-
-
-<!-- <div class="form-group mb-2">
-  <label for="username">Enter a username:</label>
-  <input
-    class="form-control"
-    type="text"
-    name="longURL"
-    placeholder="new username"
-    style="width: 300px; margin: 1em"
-  />
-  <label for="password">Enter a password:</label>
-  <input
-    class="form-control"
-    type="text"
-    name="password"
-    placeholder="new password"
-    style="width: 300px; margin: 1em"
-  />
-  <button type="submit" class="btn btn-primary">Submit</button>
-</div> -->
