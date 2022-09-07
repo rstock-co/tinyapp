@@ -1,9 +1,9 @@
-const {generateID} = require('./js/functions');
 const express = require("express");
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
-
 const app = express();
+
+const {generateID} = require('./js/functions');
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
@@ -130,9 +130,15 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
+  const id = generateID(36, 6);
   const email = req.body.email;
   const password = req.body.password;
-  console.log(email,password)
+  const user = {
+    id,
+    email,
+    password,
+  }
+  users[id] = user;
 })
 
 // SAMPLE CODE (erase later)
