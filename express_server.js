@@ -133,12 +133,18 @@ app.post("/register", (req, res) => {
   const id = generateID(36, 6);
   const email = req.body.email;
   const password = req.body.password;
+  
+  // create object for new user then add to data store
   const user = {
     id,
     email,
     password,
   }
   users[id] = user;
+
+  // set a cookie for new user and then redirect
+  res.cookie('user_id', id);
+  res.redirect("/urls");
 })
 
 // SAMPLE CODE (erase later)
