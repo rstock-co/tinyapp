@@ -1,35 +1,52 @@
+const {generateID} = require('./js/functions');
 const express = require("express");
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+
 const app = express();
 const PORT = 8080; // default port 8080
 
-// note that max value for base is 36: higher base = more alpha chars vs numeric chars
-const generateRandomString = (base, stringLength) =>
-  Math.random()
-    .toString(base) 
-    .substring(2, stringLength + 2);
-
 app.set("view engine", "ejs");
 
-// middleware to parse POST request body
+// MIDDLEWARE
+
+// parse POST request body
 app.use(express.urlencoded({ extended: true }));
 
-// middleware to log HTTP requests in terminal
+// log HTTP requests in terminal
 app.use(morgan('dev'));
 
-// middleware to parse cookies
+// parse cookies
 app.use(cookieParser());
+
+// DATA
+
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
 
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 };
 
+// ROUTES
+
+//home
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+//urls
 app.get("/urls", (req, res) => {
   const templateVars = { 
     urls: urlDatabase,
@@ -44,7 +61,7 @@ app.post("/urls", (req, res) => {
   console.log(newURL);
 
   // generate a UID for the new URL
-  newURL.id = generateRandomString(36, 6);
+  newURL.id = generateID(36, 6);
   console.log(newURL.id);
 
   // add the new URL to our database
@@ -55,11 +72,13 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${newURL.id}`);
 });
 
+// create new URL
 app.get("/urls/new", (req, res) => {
   const templateVars = {username: req.cookies["username"]};
   res.render("urls_new", templateVars);
 });
 
+// delete URL
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
 
@@ -68,6 +87,7 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect('/urls');
   });
 
+// single URL
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
@@ -85,16 +105,14 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
+// redirect from short URL to long URL
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
  }); 
 
-// It should set a cookie named `username` to the value submitted 
-// in the request body via the login form. 
-// After our server has set the cookie it should redirect 
-// the browser back to the /urls page. We don't need to provide the (optional) options for now.
 
+// login / logout form in nav header bar
 app.post("/login", (req, res) => {
   res.cookie('username', req.body.username);
   res.redirect("/urls");
@@ -105,6 +123,7 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+// user registration page
 app.get("/register", (req, res) => {
   const templateVars = {username: req.cookies["username"]};
   res.render("urls_register",templateVars);
@@ -116,13 +135,14 @@ app.post("/register", (req, res) => {
   console.log(email,password)
 })
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
+// SAMPLE CODE (erase later)
+// app.get("/urls.json", (req, res) => {
+//   res.json(urlDatabase);
+// });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
+// app.get("/hello", (req, res) => {
+//   res.send("<html><body>Hello <b>World</b></body></html>\n");
+// });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
