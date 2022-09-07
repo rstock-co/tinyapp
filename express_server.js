@@ -4,10 +4,11 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
 
-const generateRandomString = (numChars, stringLength) =>
+// note that max value for base is 36: higher base = more alpha chars vs numeric chars
+const generateRandomString = (base, stringLength) =>
   Math.random()
-    .toString(numChars)
-    .substring(3, stringLength + 3);
+    .toString(base) 
+    .substring(2, stringLength + 2);
 
 app.set("view engine", "ejs");
 
