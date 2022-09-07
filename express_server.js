@@ -90,7 +90,8 @@ app.get("/u/:id", (req, res) => {
 // the browser back to the /urls page. We don't need to provide the (optional) options for now.
 
 app.post("/login", (req, res) => {
-
+  res.cookie('username', req.body.username);
+  res.redirect("/urls");
 });
 
 app.get("/urls.json", (req, res) => {
