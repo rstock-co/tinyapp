@@ -34,10 +34,10 @@ const users = {
   },
 };
 
-const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
-};
+// const urlDatabase = {
+//   b2xVn2: "http://www.lighthouselabs.ca",
+//   "9sm5xK": "http://www.google.com",
+// };
 
 // ROUTES
 
@@ -48,10 +48,7 @@ app.get("/", (req, res) => {
 
 //urls
 app.get("/urls", (req, res) => {
-  const templateVars = { 
-    urls: urlDatabase,
-    username: req.cookies["username"], 
-  };
+  const templateVars = { user };
   res.render("urls_index", templateVars);
 });
 
@@ -74,16 +71,14 @@ app.post("/urls", (req, res) => {
 
 // create new URL
 app.get("/urls/new", (req, res) => {
-  const templateVars = {username: req.cookies["username"]};
+  const templateVars = { user };
   res.render("urls_new", templateVars);
 });
 
 // delete URL
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
-
   delete urlDatabase[id];
-
   res.redirect('/urls');
   });
 
@@ -92,7 +87,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"],
+    user,
   };
   res.render("urls_show", templateVars);
 });
@@ -125,7 +120,7 @@ app.post("/logout", (req, res) => {
 
 // user registration page
 app.get("/register", (req, res) => {
-  const templateVars = {username: req.cookies["username"]};
+  const templateVars = { user };
   res.render("urls_register",templateVars);
 });
 
@@ -133,7 +128,7 @@ app.post("/register", (req, res) => {
   const id = generateID(36, 6);
   const email = req.body.email;
   const password = req.body.password;
-  
+
   // create object for new user then add to data store
   const user = {
     id,
@@ -141,6 +136,8 @@ app.post("/register", (req, res) => {
     password,
   }
   users[id] = user;
+
+  console.log(users)
 
   // set a cookie for new user and then redirect
   res.cookie('user_id', id);
