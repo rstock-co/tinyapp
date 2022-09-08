@@ -35,8 +35,14 @@ const users = {
 };
 
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 // ------
@@ -71,8 +77,17 @@ app.post("/urls", (req, res) => {
   // generate a UID for the new URL
   newURL.id = generateID(36, 6);
 
+  // check if URL begins with 'http' & append if not
+  let { longURL } = newURL; 
+  if (longURL.substring(0, 4) !== 'http') {
+    longURL = `https://${longURL}`
+  }
+
   // add the new URL to our database
-  urlDatabase[newURL.id] = newURL.longURL;
+  urlDatabase[newURL.id] = {
+    longURL,
+    userID: cookie,
+  }
   console.log(urlDatabase);
 
   // ask the browser to redirect to the 'urls/:id' route to display the new URL
@@ -104,7 +119,7 @@ app.get("/urls/:id", (req, res) => {
 
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     users,
     cookie: req.cookies["user_id"],
   };
@@ -112,9 +127,18 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => {
-  const longURL = req.body.longURL;
+  let longURL = req.body.longURL;
   const id = req.params.id;
-  urlDatabase[id] = longURL;
+
+  // check if URL begins with 'http' & append if not
+  if (longURL.substring(0, 4) !== 'http') {
+    longURL = `https://${longURL}`
+  }
+
+  urlDatabase[id] = {
+    longURL,
+    userID: req.cookies["user_id"]
+  }
   console.log(urlDatabase);
   res.redirect("/urls");
 });
@@ -122,15 +146,13 @@ app.post("/urls/:id", (req, res) => {
 // SHORT TO LONG URL REDIRECT PAGE
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  let longURL = urlDatabase[id];
-  // check if URL begins with 'http' & append if not
-  if (longURL.substring(0, 4) !== 'http') {
-    longURL = `https://${longURL}`
-  }
-  console.log(longURL)
-  if (!id) {
+  let longURL = urlDatabase[id].longURL;
+
+  // if id doesn't exist in database, return error message
+  if (!longURL) {
     return res.send("This short URL does not exist.");
   }
+
   res.redirect(longURL);
 });
 
