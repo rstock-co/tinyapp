@@ -158,9 +158,13 @@ app.post("/register", (req, res) => {
 
 // USER LOGIN PAGE
 app.get("/login", (req, res) => {
+  const cookie = req.cookies["user_id"];
+  if (cookie) {
+    return res.redirect("/urls");
+  }
   const templateVars = {
     users,
-    cookie: req.cookies["user_id"],
+    cookie,
   };
   res.render("urls_login", templateVars);
 });
