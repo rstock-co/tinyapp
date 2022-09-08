@@ -1,38 +1,59 @@
 const express = require("express");
-const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
+const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
 const app = express();
-const PORT = 8080; // default port 8080
 
-const generateRandomString = (numChars, stringLength) =>
-  Math.random()
-    .toString(numChars)
-    .substring(3, stringLength + 3);
+const { generateID, getUserByEmail } = require("./js/functions");
+const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
 
-// middleware to parse POST request body
+// MIDDLEWARE
+
+// parse POST request body
 app.use(express.urlencoded({ extended: true }));
 
-// middleware to log HTTP requests in terminal
-app.use(morgan('dev'));
+// log HTTP requests in terminal
+app.use(morgan("dev"));
 
-// middleware to parse cookies
+// parse cookies
 app.use(cookieParser());
+
+// DATA
+
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
 
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 };
 
+// ------
+// ROUTES
+// ------
+
+// HOME
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+// MY URLS TABLE PAGE
 app.get("/urls", (req, res) => {
-  const templateVars = { 
+  const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"], 
+    users,
+    cookie: req.cookies["user_id"],
   };
   res.render("urls_index", templateVars);
 });
@@ -43,7 +64,7 @@ app.post("/urls", (req, res) => {
   console.log(newURL);
 
   // generate a UID for the new URL
-  newURL.id = generateRandomString(36, 6);
+  newURL.id = generateID(36, 6);
   console.log(newURL.id);
 
   // add the new URL to our database
@@ -54,24 +75,29 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${newURL.id}`);
 });
 
+// CREATE NEW URL PAGE
 app.get("/urls/new", (req, res) => {
-  const templateVars = {username: req.cookies["username"]};
+  const templateVars = {
+    users,
+    cookie: req.cookies["user_id"],
+  };
   res.render("urls_new", templateVars);
 });
 
+// delete URL
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
-
   delete urlDatabase[id];
+  res.redirect("/urls");
+});
 
-  res.redirect('/urls');
-  });
-
+// SINGLE URL DETAILS PAGE
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"],
+    users,
+    cookie: req.cookies["user_id"],
   };
   res.render("urls_show", templateVars);
 });
@@ -80,36 +106,88 @@ app.post("/urls/:id", (req, res) => {
   const longURL = req.body.longURL;
   const id = req.params.id;
   urlDatabase[id] = longURL;
-  console.log(urlDatabase)
+  console.log(urlDatabase);
   res.redirect("/urls");
 });
 
+// SHORT TO LONG URL REDIRECT PAGE
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
- }); 
+});
 
-// It should set a cookie named `username` to the value submitted 
-// in the request body via the login form. 
-// After our server has set the cookie it should redirect 
-// the browser back to the /urls page. We don't need to provide the (optional) options for now.
+// USER REGISTRATION PAGE
+app.get("/register", (req, res) => {
+  const templateVars = {
+    users,
+    cookie: req.cookies["user_id"],
+  };
+  res.render("urls_register", templateVars);
+});
+
+app.post("/register", (req, res) => {
+  const id = generateID(36, 6);
+  const email = req.body.email;
+  const password = req.body.password;
+  const userFound = getUserByEmail(email, users);
+
+  // handle registration errors
+  if (email === "" || password === "" || userFound) {
+    res.status(400);
+    return res.send("Error: Registration not completed.");
+  }
+
+  // create object for new user then add to data store
+  const user = {
+    id,
+    email,
+    password,
+  };
+  users[id] = user;
+
+  console.log(users);
+
+  // set a cookie for new user and then redirect
+  res.cookie("user_id", id);
+  res.redirect("/urls");
+});
+
+// USER LOGIN PAGE
+app.get("/login", (req, res) => {
+  const templateVars = {
+    users,
+    cookie: req.cookies["user_id"],
+  };
+  res.render("urls_login", templateVars);
+});
 
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
+  const email = req.body.email;
+  const formPass = req.body.password;
+
+  console.log("User Login attempted");
+  console.log("Email: ", email);
+  console.log("Password: ", formPass);
+
+  const userFound = getUserByEmail(email, users);
+  const { password, id } = userFound;
+  const passwordMatch = password === formPass;
+
+  // handle login errors
+  if (email === "" || formPass === "" || !userFound || !passwordMatch) {
+    res.status(403);
+    return res.send("Error: Login not completed.");
+  }
+
+  // upon successful login, set a cookie for user and then redirect
+  res.cookie("user_id", id);
   res.redirect("/urls");
 });
 
+// USER LOGOUT
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie("user_id");
   res.redirect("/urls");
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
 app.listen(PORT, () => {
