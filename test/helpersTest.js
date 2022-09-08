@@ -30,6 +30,5 @@ describe('getUserByEmail', function() {
     const user = getUserByEmail("", testUsers);
     const expectedUserID = undefined;
     assert.strictEqual(user, null);
-    
   });
 });
