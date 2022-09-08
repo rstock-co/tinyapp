@@ -116,11 +116,6 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
-app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
-  res.redirect("/urls");
-});
-
 // USER REGISTRATION PAGE
 app.get("/register", (req, res) => {
   const templateVars = {
@@ -189,14 +184,11 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
-// SAMPLE CODE (erase later)
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
-
-// app.get("/hello", (req, res) => {
-//   res.send("<html><body>Hello <b>World</b></body></html>\n");
-// });
+// USER LOGOUT
+app.post("/logout", (req, res) => {
+  res.clearCookie("user_id");
+  res.redirect("/urls");
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
