@@ -59,6 +59,11 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
+  const cookie = req.cookies["user_id"];
+  if (!cookie) {
+    return res.send("You must be logged in to shorten URLs.");
+  }
+
   // create a new URL object
   const newURL = req.body;
   console.log(newURL);
@@ -77,9 +82,13 @@ app.post("/urls", (req, res) => {
 
 // CREATE NEW URL PAGE
 app.get("/urls/new", (req, res) => {
+  const cookie = req.cookies["user_id"];
+  if (!cookie) {
+    return res.redirect("/login");
+  }
   const templateVars = {
     users,
-    cookie: req.cookies["user_id"],
+    cookie,
   };
   res.render("urls_new", templateVars);
 });
