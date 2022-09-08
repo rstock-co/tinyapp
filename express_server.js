@@ -70,7 +70,6 @@ app.post("/urls", (req, res) => {
 
   // generate a UID for the new URL
   newURL.id = generateID(36, 6);
-  console.log(newURL.id);
 
   // add the new URL to our database
   urlDatabase[newURL.id] = newURL.longURL;
@@ -102,6 +101,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // SINGLE URL DETAILS PAGE
 app.get("/urls/:id", (req, res) => {
+
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
@@ -121,7 +121,16 @@ app.post("/urls/:id", (req, res) => {
 
 // SHORT TO LONG URL REDIRECT PAGE
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
+  const id = req.params.id;
+  let longURL = urlDatabase[id];
+  // check if URL begins with 'http' & append if not
+  if (longURL.substring(0, 4) !== 'http') {
+    longURL = `https://${longURL}`
+  }
+  console.log(longURL)
+  if (!id) {
+    return res.send("This short URL does not exist.");
+  }
   res.redirect(longURL);
 });
 
@@ -146,7 +155,7 @@ app.post("/register", (req, res) => {
 
   // handle registration errors
   if (email === "" || password === "" || userFound) {
-    res.status(400);
+    res.status(400);;
     return res.send("Error: Registration not completed.");
   }
 
