@@ -3,12 +3,14 @@ const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const app = express();
 
-const { generateID, getUserByEmail } = require("./js/functions");
+const { generateID, getUserByEmail, urlsForUser } = require("./js/functions");
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
 
+// ----------
 // MIDDLEWARE
+// ----------
 
 // parse POST request body
 app.use(express.urlencoded({ extended: true }));
@@ -19,7 +21,9 @@ app.use(morgan("dev"));
 // parse cookies
 app.use(cookieParser());
 
+// ------
 // DATA
+// ------
 
 const users = {
   userRandomID: {
@@ -32,6 +36,11 @@ const users = {
     email: "user2@example.com",
     password: "dishwasher-funk",
   },
+  user3RandomID: {
+    id: "aJ48lW",
+    email: "easy@e.com",
+    password: "abc"
+  }
 };
 
 const urlDatabase = {
@@ -54,12 +63,21 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-// MY URLS TABLE PAGE
+// `My URLS` PAGE
 app.get("/urls", (req, res) => {
+  // check if user is logged in 
+  const cookie = req.cookies["user_id"];
+  if (!cookie) {
+    return res.send("You must register or be logged in to view URLs.");
+  }
+
+  // filter URLs specifically for logged in user
+  const userUrls = urlsForUser(cookie, urlDatabase);
+
   const templateVars = {
-    urls: urlDatabase,
+    urls: userUrls,
     users,
-    cookie: req.cookies["user_id"],
+    cookie
   };
   res.render("urls_index", templateVars);
 });
@@ -67,7 +85,7 @@ app.get("/urls", (req, res) => {
 app.post("/urls", (req, res) => {
   const cookie = req.cookies["user_id"];
   if (!cookie) {
-    return res.send("You must be logged in to shorten URLs.");
+    return res.send("You must register or be logged in to shorten URLs.");
   }
 
   // create a new URL object
@@ -117,9 +135,18 @@ app.post("/urls/:id/delete", (req, res) => {
 // SINGLE URL DETAILS PAGE
 app.get("/urls/:id", (req, res) => {
 
+  const cookie = req.cookies["user_id"];
+  if (!cookie) {
+    return res.send("You must register or be logged in to edit URLs.");
+  }
+  const id = req.params.id;
+  if (urlDatabase[id].userID !== cookie) {
+    return res.send("This URL is not in your database. Click on 'Create New URL' to add it.");
+  }
+
   const templateVars = {
-    id: req.params.id,
-    longURL: urlDatabase[req.params.id].longURL,
+    id,
+    longURL: urlDatabase[id].longURL,
     users,
     cookie: req.cookies["user_id"],
   };
