@@ -5,11 +5,14 @@ const generateID = (base, stringLength) =>
     .substring(2, stringLength + 2);
 
 // return either the entire user object or null if not found.
-const userLookup = (email, userID, userDatabase) => {
-  if (email === userDatabase[userID].email) {
-    return userDatabase;
+const getUserByEmail = (email, userDatabase) => {
+  for (user in userDatabase) {
+    if (email === userDatabase[user].email) {
+      console.log(`User found: duplicate email`)
+      return userDatabase;
+    }
   }
   return null;
 };
 
-module.exports = { generateID, userLookup };
+module.exports = { generateID, getUserByEmail };
