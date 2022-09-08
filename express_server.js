@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
+const bcrypt = require("bcryptjs");
 
 // ---------- HELPER FUNCTIONS
 
@@ -121,8 +122,6 @@ app.post("/urls", (req, res) => {
   return res.render("error", templateVars);
 });
 
-///////////////  CURRENTLY IN DEVELOPMENT /////////////
-
 // GET: `NEW URL` page
 app.get("/urls/new", (req, res) => {
   const cookie = req.cookies["user_id"];
@@ -142,7 +141,6 @@ app.get("/urls/new", (req, res) => {
   }
   return res.redirect("/login");
 });
-///////////////  CURRENTLY IN DEVELOPMENT /////////////
 
 // CRUD - [D]elete URL
 app.post("/urls/:id/delete", (req, res) => {
@@ -258,6 +256,7 @@ app.post("/register", (req, res) => {
   const id = generateID(36, 6);
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
   const userFound = getUserByEmail(email, users);
 
   // handle registration errors
@@ -270,7 +269,7 @@ app.post("/register", (req, res) => {
   const user = {
     id,
     email,
-    password,
+    password: hashedPassword,
   };
   users[id] = user;
 
@@ -307,7 +306,8 @@ app.post("/login", (req, res) => {
   }
 
   const { password, id } = userFound;
-  if (password !== formPass) {
+
+  if (!bcrypt.compareSync(formPass, password)) {
     res.status(403);
     return res.send("Error: Login not completed.");
   }
