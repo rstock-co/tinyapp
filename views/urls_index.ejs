@@ -20,6 +20,9 @@
   <body>
     <%- include('partials/_header',{users, cookie}); %>
     <main style="margin: 1em">
+      <%if (err) { %>
+      <%- include('partials/_errors',{errMsgMain, errMsgSub, err}); %>
+      <% } else { %>
       <h3>My URLs</h3>
       <table class="table">
         <thead>
@@ -49,6 +52,7 @@
           <% } %>
         </tbody>
       </table>
+      <% } %>
     </main>
     <!-- Bootstrap JS -->
     <script

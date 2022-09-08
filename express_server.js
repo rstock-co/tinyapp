@@ -5,7 +5,6 @@ const app = express();
 
 // import helper functions
 const { generateID, getUserByEmail, urlsForUser } = require("./js/functions");
-
 const { errNotLoggedIn, errDoesNotExist, errDoesNotBelongToUser } = require("./js/errors");
 
 const PORT = 8080; // default port 8080
@@ -70,16 +69,21 @@ app.get("/", (req, res) => {
 // `My URLS` PAGE
 app.get("/urls", (req, res) => {
   // error handling
-  const cookie = req.cookies["user_id"];
-  if (errNotLoggedIn(res, cookie)) return;
-
+  let cookie = req.cookies["user_id"];
+  const { errMsgMain, errMsgSub, err } = errNotLoggedIn(cookie);
+  console.log('err: ',err)
+  if (err) cookie = '8asdfa';
+  
   // filter URLs specifically for logged in user
-  const userUrls = urlsForUser(cookie, urlDatabase);
+  const userUrls = err ? {} : urlsForUser(cookie, urlDatabase);
 
   const templateVars = {
     urls: userUrls,
     users,
     cookie,
+    errMsgMain,
+    errMsgSub,
+    err
   };
   res.render("urls_index", templateVars);
 });
@@ -87,7 +91,7 @@ app.get("/urls", (req, res) => {
 app.post("/urls", (req, res) => {
   // error handling
   const cookie = req.cookies["user_id"];
-  if (errNotLoggedIn(res, cookie)) return;
+  if (errNotLoggedIn(cookie).err) return;
 
   // create a new URL object
   const newURL = req.body;
@@ -117,11 +121,15 @@ app.post("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   // error handling
   const cookie = req.cookies["user_id"];
-  if (errNotLoggedIn(res, cookie)) return;
+  const { errMsgMain, errMsgSub, err } = errNotLoggedIn(cookie);
+  if (err) return;
 
   const templateVars = {
     users,
     cookie,
+    errMsgMain,
+    errMsgSub,
+    err
   };
   res.render("urls_new", templateVars);
 });
@@ -130,11 +138,11 @@ app.get("/urls/new", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   // error handling
   const cookie = req.cookies["user_id"];
-  if (errNotLoggedIn(res, cookie)) return;
+  if (errNotLoggedIn(res, cookie).err) return;
 
   const id = req.params.id;
-  if (errDoesNotExist(res, id, urlDatabase)) return;
-  if (errDoesNotBelongToUser(res, id, cookie, urlDatabase)) return;
+  if (errDoesNotExist(id, urlDatabase).err) return;
+  if (errDoesNotBelongToUser(id, cookie, urlDatabase).err) return;
 
   delete urlDatabase[id];
   res.redirect("/urls");
@@ -144,11 +152,11 @@ app.post("/urls/:id/delete", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   // error handling
   const cookie = req.cookies["user_id"];
-  if (errNotLoggedIn(res, cookie)) return;
+  if (errNotLoggedIn(res, cookie).err) return;
 
   const id = req.params.id;
-  if (errDoesNotExist(res, id, urlDatabase)) return;
-  if (errDoesNotBelongToUser(res, id, cookie, urlDatabase)) return;
+  if (errDoesNotExist(id, urlDatabase).err) return;
+  if (errDoesNotBelongToUser(id, cookie, urlDatabase).err) return;
 
   const templateVars = {
     id,
@@ -165,8 +173,8 @@ app.post("/urls/:id", (req, res) => {
   if (errNotLoggedIn(res, cookie)) return;
 
   const id = req.params.id;
-  if (errDoesNotExist(res, id, urlDatabase)) return;
-  if (errDoesNotBelongToUser(res, id, cookie, urlDatabase)) return;
+  if (errDoesNotExist(id, urlDatabase).err) return;
+  if (errDoesNotBelongToUser(id, cookie, urlDatabase).err) return;
 
   // check if URL begins with 'http' & append if not
   let longURL = req.body.longURL;
