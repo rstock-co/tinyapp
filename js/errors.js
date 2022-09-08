@@ -1,31 +1,73 @@
 const errNotLoggedIn = (cookie) => {
-  let err = false;
-  if (!cookie) err = true;
-  return {
-    err,
-    errMsgMain: "You must be registered or logged in to perform this action.",
-    errMsgSub: `Click on 'Login' or 'Register' link in navbar above.`,
+  console.log('errNotLoggedIn ran')
+  if (cookie) {
+    console.log('From errNotLoggedIn: ', 'cookie found, user identified')
+    return { error: false };
+  }
+
+  const obj = {
+    errorTitle: "User Not Found",
+    errorMessage: "You must be registered or logged in to perform this action.",
+    buttons: ["Register", "Login"],
+    hrefs: ["/register", "/login"],
+    error: true,
   };
+
+  console.log('obj: ', obj)
+
+  return obj;
+
+  // return {
+  //   err,
+  //   errMsgMain: ,
+  //   errMsgSub: `Click on 'Login' or 'Register' link below.`,
+  // };
 };
 
 const errDoesNotExist = (id, database) => {
-  let err = false;
-  if (!database[id]) err = true;
+  console.log('errDoesNotExist ran')
+  if (database[id]) return { error: false };
+
   return {
-    err,
-    errMsgMain: "This URL does not exist.",
-    errMsgSub: `Click on 'Create New URL' to add new URLs to your profile.`,
+    errorTitle: "URL Does Not Exist",
+    errorMessage:
+      "This URL does not exist in the database. To create a URL, click `Create URL` below:",
+    buttons: ["Create URL"],
+    hrefs: ["/urls/new"],
+    error: true,
   };
+
+  // return {
+  //   err,
+  //   errMsgMain: "This URL does not exist.",
+  //   errMsgSub: `Click on 'Create New URL' to add new URLs to your profile.`,
+  // };
 };
 
 const errDoesNotBelongToUser = (id, cookie, database) => {
-  let err = false;
-  if (database[id].userID !== cookie) err = true;
+  console.log('errDoesNotBelongToUser ran')
+  if (!database[id]) return { error: "does not exist" };
+  if (database[id].userID === cookie) return { error: false };
   return {
-    err,
-    errMsgMain: "Could not find URL in your User Profile.",
-    errMsgSub: `Click on 'Create New URL' to add new URLs to your profile.`,
+    errorTitle: "URL Does Not Belong To User",
+    errorMessage:
+      "This URL does not exist in your profile. To add a URL to your profile, click `Add URL` below:",
+    buttons: ["Add URL"],
+    hrefs: ["/urls/new"],
+    error: true,
   };
 };
 
-module.exports = { errNotLoggedIn, errDoesNotExist, errDoesNotBelongToUser };
+const handleErrors = (errorObject) => {
+  for (err in errorObject) {
+    if (errorObject[err].error) return errorObject[err];
+  }
+  return false;
+};
+
+module.exports = {
+  errNotLoggedIn,
+  errDoesNotExist,
+  errDoesNotBelongToUser,
+  handleErrors,
+};

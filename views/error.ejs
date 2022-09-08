@@ -1,3 +1,12 @@
+<!-- Data Structure being passed in
+{ 
+  errorTitle,
+  errorMessage,
+  buttons: [button1, button2]
+  hrefs: [href1, href2]
+}
+-->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -14,13 +23,16 @@
   <body>
     <%- include('partials/_header',{users, cookie}); %>
     <section class="generic-error">
-      <div class="card">
-        <h4 class="card-header">Error</h4>
+      <div class="card w-50 m-4">
+        <h4 class="card-header"><b>Error: <%= errors.errorTitle %></b></h4>
         <div class="card-body">
-          <blockquote class="blockquote mb-0">
-            <p><%= errMsgMain %></p>
-            <footer class="blockquote-footer"><%= errMsgSub %></footer>
-          </blockquote>
+          <h5 class="card-text"><%= errors.errorMessage %></h5>
+          <%if (errors.buttons[0]) { %>
+          <a href=<%= errors.hrefs[0] %> class="btn btn-primary mr-2 mt-2"><%= errors.buttons[0] %></a>
+          <% } %>
+          <%if (errors.buttons[1]) { %>
+          <a href=<%= errors.hrefs[1] %> class="btn btn-primary mt-2"><%= errors.buttons[1] %></a>
+          <% } %>
         </div>
       </div>
     </section>

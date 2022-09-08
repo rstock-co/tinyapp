@@ -1,36 +1,24 @@
 const express = require("express");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
-const app = express();
 
-// import helper functions
-const { generateID, getUserByEmail, urlsForUser, appendHttp } = require("./js/helpers");
+// ---------- HELPER FUNCTIONS
+
+const {
+  generateID,
+  getUserByEmail,
+  urlsForUser,
+  appendHttp,
+} = require("./js/helpers");
+
 const {
   errNotLoggedIn,
   errDoesNotExist,
   errDoesNotBelongToUser,
+  handleErrors,
 } = require("./js/errors");
 
-const PORT = 8080; // default port 8080
-
-app.set("view engine", "ejs");
-
-// ----------
-// MIDDLEWARE
-// ----------
-
-// parse POST request body
-app.use(express.urlencoded({ extended: true }));
-
-// log HTTP requests in terminal
-app.use(morgan("dev"));
-
-// parse cookies
-app.use(cookieParser());
-
-// ------
-// DATA
-// ------
+// ---------- DATA
 
 const users = {
   userRandomID: {
@@ -61,137 +49,196 @@ const urlDatabase = {
   },
 };
 
-// ------
-// ROUTES
-// ------
+// ---------- SETUP & MIDDLEWARE
 
-// HOME
+const app = express();
+const PORT = 8080; // default port 8080
+app.set("view engine", "ejs");
+
+// parse POST request body
+app.use(express.urlencoded({ extended: true }));
+
+// log HTTP requests in terminal
+app.use(morgan("dev"));
+
+// parse cookies
+app.use(cookieParser());
+
+// ---------- ROUTES & ENDPOINTS
+
+// GET: Homepage
 app.get("/", (req, res) => {
   let cookie = req.cookies["user_id"];
   if (cookie) return res.redirect("/urls");
   res.redirect("/login");
 });
 
-// `My URLS` PAGE
+// GET: `My URLS` page
 app.get("/urls", (req, res) => {
   // error handling
   let cookie = req.cookies["user_id"];
-  const { errMsgMain, errMsgSub, err } = errNotLoggedIn(cookie);
+  const errors = handleErrors({
+    login: errNotLoggedIn(cookie),
+  });
 
   // filter URLs specifically for logged in user
   const userUrls = urlsForUser(cookie, urlDatabase);
 
   const templateVars = {
+    errors,
     urls: userUrls,
     users,
     cookie,
-    errMsgMain,
-    errMsgSub,
-    err,
   };
-  if (err) return res.render("error", templateVars);
-  res.render("urls_index", templateVars);
+  if (errors === false) {
+    return res.render("urls_index", templateVars);
+  }
+  return res.render("error", templateVars);
 });
 
+// CRUD - [C]reate new URL
 app.post("/urls", (req, res) => {
   // error handling
-  const cookie = req.cookies["user_id"];
-  if (errNotLoggedIn(cookie).err) return;
-
-  const id = generateID(36, 6);
-  const longURL = appendHttp(req.body.longURL);
-  
-  // add the new URL to our database
-  urlDatabase[id] = {
-    longURL,
-    userID: cookie,
-  };
-
-  // redirect to the 'urls/:id' route to display the new URL
-  res.redirect(`/urls/${id}`);
-});
-
-// CREATE NEW URL PAGE
-app.get("/urls/new", (req, res) => {
-  // error handling
   let cookie = req.cookies["user_id"];
-  const { errMsgMain, errMsgSub, err } = errNotLoggedIn(cookie);
+  const errors = handleErrors({
+    login: errNotLoggedIn(cookie),
+  });
 
-  const templateVars = {
-    users,
-    cookie,
-    errMsgMain,
-    errMsgSub,
-    err,
-  };
-  
-  if (err) return res.render("error", templateVars);
-  res.render("urls_new", templateVars);
+  if (errors === false) {
+    const id = generateID(36, 6);
+    const longURL = appendHttp(req.body.longURL);
+
+    // add the new URL to our database
+    urlDatabase[id] = {
+      longURL,
+      userID: cookie,
+    };
+
+    // redirect to the 'urls/:id' route to display the new URL
+    return res.redirect(`/urls/${id}`);
+  }
+  const templateVars = { errors };
+  return res.render("error", templateVars);
 });
 
-// delete URL
+///////////////  CURRENTLY IN DEVELOPMENT /////////////
+
+// GET: `NEW URL` page
+app.get("/urls/new", (req, res) => {
+  const cookie = req.cookies["user_id"];
+
+  // check for errors
+  const errors = handleErrors({
+    login: errNotLoggedIn(cookie),
+  });
+
+  // if user isn't logged in, redirect to login page
+  if (errors === false) {
+    const templateVars = {
+      users,
+      cookie,
+    };
+    return res.render("urls_new", templateVars);
+  }
+  return res.redirect("/login");
+});
+///////////////  CURRENTLY IN DEVELOPMENT /////////////
+
+// CRUD - [D]elete URL
 app.post("/urls/:id/delete", (req, res) => {
-  // error handling
   const cookie = req.cookies["user_id"];
-  if (errNotLoggedIn(res, cookie).err) return;
-
   const id = req.params.id;
-  if (errDoesNotExist(id, urlDatabase).err) return;
-  if (errDoesNotBelongToUser(id, cookie, urlDatabase).err) return;
 
-  delete urlDatabase[id];
-  res.redirect("/urls");
+  // check for errors
+  const errors = handleErrors({
+    login: errNotLoggedIn(cookie),
+    exists: errDoesNotExist(id, urlDatabase),
+    belongs: errDoesNotBelongToUser(id, cookie, urlDatabase),
+  });
+
+  // if no errors, delete URL
+  if (errors === false) {
+    delete urlDatabase[id];
+    res.redirect("/urls");
+  }
+
+  const templateVars = { 
+    errors,
+    users,
+    id,
+    cookie
+   };
+
+  return res.render("error", templateVars);
 });
 
-// SINGLE URL DETAILS PAGE
+// GET: Single URL details page
 app.get("/urls/:id", (req, res) => {
-  // error handling
   const cookie = req.cookies["user_id"];
-  if (errNotLoggedIn(res, cookie).err) return;
-
   const id = req.params.id;
-  if (errDoesNotExist(id, urlDatabase).err) return;
-  if (errDoesNotBelongToUser(id, cookie, urlDatabase).err) return;
+
+  const errors = handleErrors({
+    login: errNotLoggedIn(cookie),
+    exists: errDoesNotExist(id, urlDatabase),
+    belongs: errDoesNotBelongToUser(id, cookie, urlDatabase),
+  });
 
   const templateVars = {
-    id,
-    longURL: urlDatabase[id].longURL,
+    errors,
     users,
     cookie,
+    id,
   };
+
+  if (errors !== false) {
+    return res.render("error", templateVars);
+  }
+
+  templateVars["longURL"] = urlDatabase[id].longURL;
   res.render("urls_show", templateVars);
 });
 
 app.post("/urls/:id", (req, res) => {
-  // error handling
   const cookie = req.cookies["user_id"];
-  if (errNotLoggedIn(cookie)) return;
-
   const id = req.params.id;
-  if (errDoesNotExist(id, urlDatabase).err) return;
-  if (errDoesNotBelongToUser(id, cookie, urlDatabase).err) return;
 
+  // check for errors
+  const errors = handleErrors({
+    login: errNotLoggedIn(cookie),
+    exists: errDoesNotExist(id, urlDatabase),
+    belongs: errDoesNotBelongToUser(id, cookie, urlDatabase),
+  });
+
+  if (errors !== false) {
+    const templateVars = {
+      errors,
+      users,
+      id,
+      cookie
+    };
+    return res.render("error", templateVars);
+  }
   const longURL = appendHttp(req.body.longURL);
-  
+
   urlDatabase[id] = {
     longURL,
     userID: cookie,
   };
-  console.log(urlDatabase);
-  res.redirect("/urls");
+  return res.redirect("/urls");
 });
 
 // SHORT TO LONG URL REDIRECT PAGE
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  let longURL = urlDatabase[id].longURL;
-
-  // if id doesn't exist in database, return error message
-  if (!longURL) {
-    return res.send("This short URL does not exist.");
+  const errors = handleErrors({
+    exists: errDoesNotExist(id, urlDatabase),
+  });
+  if (errors === false) {
+    let longURL = urlDatabase[id].longURL;
+    return res.redirect(longURL);
   }
-
-  res.redirect(longURL);
+  const templateVars = { errors };
+  return res.render("error", templateVars);
 });
 
 // USER REGISTRATION PAGE
@@ -251,9 +298,6 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const formPass = req.body.password;
 
-  console.log("User Login attempted");
-  console.log("Email: ", email);
-  console.log("Password: ", formPass);
   const userFound = getUserByEmail(email, users);
 
   // handle login errors
@@ -278,6 +322,12 @@ app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/urls");
 });
+
+// ---------- CRUD OPERATIONS
+
+// ---------- CATCH ALL ROUTE
+
+// ---------- LISTEN
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
