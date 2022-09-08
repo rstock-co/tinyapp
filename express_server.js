@@ -1,6 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
-const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
 
 // ---------- HELPER FUNCTIONS
@@ -62,8 +62,8 @@ app.use(express.urlencoded({ extended: true }));
 // log HTTP requests in terminal
 app.use(morgan("dev"));
 
-// parse cookies
-app.use(cookieParser());
+// manage cookies
+app.use(cookieSession());
 
 // ---------- ROUTES & ENDPOINTS
 
