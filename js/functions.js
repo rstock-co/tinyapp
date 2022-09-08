@@ -14,4 +14,14 @@ const getUserByEmail = (email, userDatabase) => {
   return null;
 };
 
-module.exports = { generateID, getUserByEmail };
+const urlsForUser = (id, urlDatabase) => {
+  let urls = {};
+  for (url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      urls[url] = urlDatabase[url]
+    }
+  }
+  return urls;
+}
+
+module.exports = { generateID, getUserByEmail, urlsForUser };
