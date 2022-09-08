@@ -118,9 +118,13 @@ app.get("/u/:id", (req, res) => {
 
 // USER REGISTRATION PAGE
 app.get("/register", (req, res) => {
+  const cookie = req.cookies["user_id"];
+  if (cookie) {
+    return res.redirect("/urls");
+  }
   const templateVars = {
     users,
-    cookie: req.cookies["user_id"],
+    cookie,
   };
   res.render("urls_register", templateVars);
 });
@@ -168,13 +172,16 @@ app.post("/login", (req, res) => {
   console.log("User Login attempted");
   console.log("Email: ", email);
   console.log("Password: ", formPass);
-
   const userFound = getUserByEmail(email, users);
-  const { password, id } = userFound;
-  const passwordMatch = password === formPass;
 
   // handle login errors
-  if (email === "" || formPass === "" || !userFound || !passwordMatch) {
+  if (!userFound ) {
+    res.status(403);
+    return res.send("Error: Login not completed.");
+  }
+
+  const { password, id } = userFound;
+  if (password !== formPass) {
     res.status(403);
     return res.send("Error: Login not completed.");
   }
