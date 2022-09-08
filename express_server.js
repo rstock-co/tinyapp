@@ -4,14 +4,9 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 // import helper functions
-const {
-  generateID,
-  getUserByEmail,
-  urlsForUser,
-  errNotLoggedIn,
-  errDoesNotExist,
-  errDoesNotBelongToUser,
-} = require("./js/functions");
+const { generateID, getUserByEmail, urlsForUser } = require("./js/functions");
+
+const { errNotLoggedIn, errDoesNotExist, errDoesNotBelongToUser } = require("./js/errors");
 
 const PORT = 8080; // default port 8080
 
