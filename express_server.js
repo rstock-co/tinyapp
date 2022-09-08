@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const app = express();
 
-const { generateID, userLookup } = require('./js/functions');
+const { generateID, getUserByEmail } = require('./js/functions');
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
@@ -139,9 +139,13 @@ app.post("/register", (req, res) => {
   const id = generateID(36, 6);
   const email = req.body.email;
   const password = req.body.password;
+  const userFound = getUserByEmail(email, users);
 
   // handle registration errors
-  
+  if (email === "" || password === "" || userFound) {
+    res.status(400);
+    return res.send('Error: Registration not completed.');
+  }
 
   // create object for new user then add to data store
   const user = {
