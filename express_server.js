@@ -3,7 +3,16 @@ const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const app = express();
 
-const { generateID, getUserByEmail, urlsForUser } = require("./js/functions");
+// import helper functions
+const {
+  generateID,
+  getUserByEmail,
+  urlsForUser,
+  errNotLoggedIn,
+  errDoesNotExist,
+  errDoesNotBelongToUser,
+} = require("./js/functions");
+
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
@@ -39,8 +48,8 @@ const users = {
   user3RandomID: {
     id: "aJ48lW",
     email: "easy@e.com",
-    password: "abc"
-  }
+    password: "abc",
+  },
 };
 
 const urlDatabase = {
@@ -65,11 +74,9 @@ app.get("/", (req, res) => {
 
 // `My URLS` PAGE
 app.get("/urls", (req, res) => {
-  // check if user is logged in 
+  // error handling
   const cookie = req.cookies["user_id"];
-  if (!cookie) {
-    return res.send("You must register or be logged in to view URLs.");
-  }
+  if (errNotLoggedIn(res, cookie)) return;
 
   // filter URLs specifically for logged in user
   const userUrls = urlsForUser(cookie, urlDatabase);
@@ -77,16 +84,15 @@ app.get("/urls", (req, res) => {
   const templateVars = {
     urls: userUrls,
     users,
-    cookie
+    cookie,
   };
   res.render("urls_index", templateVars);
 });
 
 app.post("/urls", (req, res) => {
+  // error handling
   const cookie = req.cookies["user_id"];
-  if (!cookie) {
-    return res.send("You must register or be logged in to shorten URLs.");
-  }
+  if (errNotLoggedIn(res, cookie)) return;
 
   // create a new URL object
   const newURL = req.body;
@@ -96,16 +102,16 @@ app.post("/urls", (req, res) => {
   newURL.id = generateID(36, 6);
 
   // check if URL begins with 'http' & append if not
-  let { longURL } = newURL; 
-  if (longURL.substring(0, 4) !== 'http') {
-    longURL = `https://${longURL}`
+  let { longURL } = newURL;
+  if (longURL.substring(0, 4) !== "http") {
+    longURL = `https://${longURL}`;
   }
 
   // add the new URL to our database
   urlDatabase[newURL.id] = {
     longURL,
     userID: cookie,
-  }
+  };
   console.log(urlDatabase);
 
   // ask the browser to redirect to the 'urls/:id' route to display the new URL
@@ -114,10 +120,10 @@ app.post("/urls", (req, res) => {
 
 // CREATE NEW URL PAGE
 app.get("/urls/new", (req, res) => {
+  // error handling
   const cookie = req.cookies["user_id"];
-  if (!cookie) {
-    return res.redirect("/login");
-  }
+  if (errNotLoggedIn(res, cookie)) return;
+
   const templateVars = {
     users,
     cookie,
@@ -127,22 +133,27 @@ app.get("/urls/new", (req, res) => {
 
 // delete URL
 app.post("/urls/:id/delete", (req, res) => {
+  // error handling
+  const cookie = req.cookies["user_id"];
+  if (errNotLoggedIn(res, cookie)) return;
+
   const id = req.params.id;
+  if (errDoesNotExist(res, id, urlDatabase)) return;
+  if (errDoesNotBelongToUser(res, id, cookie, urlDatabase)) return;
+
   delete urlDatabase[id];
   res.redirect("/urls");
 });
 
 // SINGLE URL DETAILS PAGE
 app.get("/urls/:id", (req, res) => {
-
+  // error handling
   const cookie = req.cookies["user_id"];
-  if (!cookie) {
-    return res.send("You must register or be logged in to edit URLs.");
-  }
+  if (errNotLoggedIn(res, cookie)) return;
+
   const id = req.params.id;
-  if (urlDatabase[id].userID !== cookie) {
-    return res.send("This URL is not in your database. Click on 'Create New URL' to add it.");
-  }
+  if (errDoesNotExist(res, id, urlDatabase)) return;
+  if (errDoesNotBelongToUser(res, id, cookie, urlDatabase)) return;
 
   const templateVars = {
     id,
@@ -154,18 +165,24 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => {
-  let longURL = req.body.longURL;
+  // error handling
+  const cookie = req.cookies["user_id"];
+  if (errNotLoggedIn(res, cookie)) return;
+
   const id = req.params.id;
+  if (errDoesNotExist(res, id, urlDatabase)) return;
+  if (errDoesNotBelongToUser(res, id, cookie, urlDatabase)) return;
 
   // check if URL begins with 'http' & append if not
-  if (longURL.substring(0, 4) !== 'http') {
-    longURL = `https://${longURL}`
+  let longURL = req.body.longURL;
+  if (longURL.substring(0, 4) !== "http") {
+    longURL = `https://${longURL}`;
   }
 
   urlDatabase[id] = {
     longURL,
-    userID: req.cookies["user_id"]
-  }
+    userID: req.cookies["user_id"],
+  };
   console.log(urlDatabase);
   res.redirect("/urls");
 });
@@ -204,7 +221,7 @@ app.post("/register", (req, res) => {
 
   // handle registration errors
   if (email === "" || password === "" || userFound) {
-    res.status(400);;
+    res.status(400);
     return res.send("Error: Registration not completed.");
   }
 
@@ -246,7 +263,7 @@ app.post("/login", (req, res) => {
   const userFound = getUserByEmail(email, users);
 
   // handle login errors
-  if (!userFound ) {
+  if (!userFound) {
     res.status(403);
     return res.send("Error: Login not completed.");
   }
