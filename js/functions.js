@@ -8,8 +8,7 @@ const generateID = (base, stringLength) =>
 const getUserByEmail = (email, userDatabase) => {
   for (user in userDatabase) {
     if (email === userDatabase[user].email) {
-      console.log(`User found: duplicate email`);
-      return userDatabase;
+      return userDatabase[user];
     }
   }
   return null;

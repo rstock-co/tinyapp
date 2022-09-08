@@ -1,9 +1,9 @@
 const express = require("express");
-const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
+const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
 const app = express();
 
-const { generateID, getUserByEmail } = require('./js/functions');
+const { generateID, getUserByEmail } = require("./js/functions");
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
@@ -14,7 +14,7 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 
 // log HTTP requests in terminal
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 
 // parse cookies
 app.use(cookieParser());
@@ -39,19 +39,21 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
+// ------
 // ROUTES
+// ------
 
-//home
+// HOME
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-//urls
+// MY URLS TABLE PAGE
 app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    users, 
-    cookie: req.cookies["user_id"]
+    users,
+    cookie: req.cookies["user_id"],
   };
   res.render("urls_index", templateVars);
 });
@@ -73,11 +75,11 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${newURL.id}`);
 });
 
-// create new URL
+// CREATE NEW URL PAGE
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    users, 
-    cookie: req.cookies["user_id"]
+    users,
+    cookie: req.cookies["user_id"],
   };
   res.render("urls_new", templateVars);
 });
@@ -86,16 +88,16 @@ app.get("/urls/new", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   delete urlDatabase[id];
-  res.redirect('/urls');
-  });
+  res.redirect("/urls");
+});
 
-// single URL
+// SINGLE URL DETAILS PAGE
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
     users,
-    cookie: req.cookies["user_id"]
+    cookie: req.cookies["user_id"],
   };
   res.render("urls_show", templateVars);
 });
@@ -104,35 +106,28 @@ app.post("/urls/:id", (req, res) => {
   const longURL = req.body.longURL;
   const id = req.params.id;
   urlDatabase[id] = longURL;
-  console.log(urlDatabase)
+  console.log(urlDatabase);
   res.redirect("/urls");
 });
 
-// redirect from short URL to long URL
+// SHORT TO LONG URL REDIRECT PAGE
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
- }); 
-
-
-// login / logout form in nav header bar
-app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
-// user registration page
+// USER REGISTRATION PAGE
 app.get("/register", (req, res) => {
   const templateVars = {
-    users, 
-    cookie: req.cookies["user_id"]
+    users,
+    cookie: req.cookies["user_id"],
   };
-  res.render("urls_register",templateVars);
+  res.render("urls_register", templateVars);
 });
 
 app.post("/register", (req, res) => {
@@ -144,7 +139,7 @@ app.post("/register", (req, res) => {
   // handle registration errors
   if (email === "" || password === "" || userFound) {
     res.status(400);
-    return res.send('Error: Registration not completed.');
+    return res.send("Error: Registration not completed.");
   }
 
   // create object for new user then add to data store
@@ -152,27 +147,46 @@ app.post("/register", (req, res) => {
     id,
     email,
     password,
-  }
+  };
   users[id] = user;
 
-  console.log(users)
+  console.log(users);
 
   // set a cookie for new user and then redirect
-  res.cookie('user_id', id);
+  res.cookie("user_id", id);
   res.redirect("/urls");
-})
+});
 
-// user login page
+// USER LOGIN PAGE
 app.get("/login", (req, res) => {
   const templateVars = {
-    users, 
-    cookie: req.cookies["user_id"]
+    users,
+    cookie: req.cookies["user_id"],
   };
-  res.render("urls_login",templateVars);
+  res.render("urls_login", templateVars);
 });
 
 app.post("/login", (req, res) => {
+  const email = req.body.email;
+  const formPass = req.body.password;
 
+  console.log("User Login attempted");
+  console.log("Email: ", email);
+  console.log("Password: ", formPass);
+
+  const userFound = getUserByEmail(email, users);
+  const { password, id } = userFound;
+  const passwordMatch = password === formPass;
+
+  // handle login errors
+  if (email === "" || formPass === "" || !userFound || !passwordMatch) {
+    res.status(403);
+    return res.send("Error: Login not completed.");
+  }
+
+  // upon successful login, set a cookie for user and then redirect
+  res.cookie("user_id", id);
+  res.redirect("/urls");
 });
 
 // SAMPLE CODE (erase later)
