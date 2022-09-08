@@ -25,4 +25,12 @@ const urlsForUser = (id, urlDatabase) => {
   return urls;
 }
 
-module.exports = { generateID, getUserByEmail, urlsForUser };
+// check if URL begins with 'http' & append if not
+const appendHttp = (url) => {
+  if (url.substring(0, 4) !== "http") {
+    return url = `https://${url}`;
+  }
+  return url;
+}
+
+module.exports = { generateID, getUserByEmail, urlsForUser, appendHttp };

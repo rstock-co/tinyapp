@@ -4,7 +4,7 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 // import helper functions
-const { generateID, getUserByEmail, urlsForUser } = require("./js/functions");
+const { generateID, getUserByEmail, urlsForUser, appendHttp } = require("./js/helpers");
 const {
   errNotLoggedIn,
   errDoesNotExist,
@@ -67,7 +67,9 @@ const urlDatabase = {
 
 // HOME
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  let cookie = req.cookies["user_id"];
+  if (cookie) return res.redirect("/urls");
+  res.redirect("/login");
 });
 
 // `My URLS` PAGE
@@ -96,28 +98,17 @@ app.post("/urls", (req, res) => {
   const cookie = req.cookies["user_id"];
   if (errNotLoggedIn(cookie).err) return;
 
-  // create a new URL object
-  const newURL = req.body;
-  console.log(newURL);
-
-  // generate a UID for the new URL
-  newURL.id = generateID(36, 6);
-
-  // check if URL begins with 'http' & append if not
-  let { longURL } = newURL;
-  if (longURL.substring(0, 4) !== "http") {
-    longURL = `https://${longURL}`;
-  }
-
+  const id = generateID(36, 6);
+  const longURL = appendHttp(req.body.longURL);
+  
   // add the new URL to our database
-  urlDatabase[newURL.id] = {
+  urlDatabase[id] = {
     longURL,
     userID: cookie,
   };
-  console.log(urlDatabase);
 
-  // ask the browser to redirect to the 'urls/:id' route to display the new URL
-  res.redirect(`/urls/${newURL.id}`);
+  // redirect to the 'urls/:id' route to display the new URL
+  res.redirect(`/urls/${id}`);
 });
 
 // CREATE NEW URL PAGE
@@ -133,6 +124,7 @@ app.get("/urls/new", (req, res) => {
     errMsgSub,
     err,
   };
+  
   if (err) return res.render("error", templateVars);
   res.render("urls_new", templateVars);
 });
@@ -165,7 +157,7 @@ app.get("/urls/:id", (req, res) => {
     id,
     longURL: urlDatabase[id].longURL,
     users,
-    cookie: req.cookies["user_id"],
+    cookie,
   };
   res.render("urls_show", templateVars);
 });
@@ -173,21 +165,17 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   // error handling
   const cookie = req.cookies["user_id"];
-  if (errNotLoggedIn(res, cookie)) return;
+  if (errNotLoggedIn(cookie)) return;
 
   const id = req.params.id;
   if (errDoesNotExist(id, urlDatabase).err) return;
   if (errDoesNotBelongToUser(id, cookie, urlDatabase).err) return;
 
-  // check if URL begins with 'http' & append if not
-  let longURL = req.body.longURL;
-  if (longURL.substring(0, 4) !== "http") {
-    longURL = `https://${longURL}`;
-  }
-
+  const longURL = appendHttp(req.body.longURL);
+  
   urlDatabase[id] = {
     longURL,
-    userID: req.cookies["user_id"],
+    userID: cookie,
   };
   console.log(urlDatabase);
   res.redirect("/urls");

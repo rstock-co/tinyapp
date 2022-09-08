@@ -19,18 +19,32 @@
   </head>
 
   <body>
-    <%- include('partials/_header',{users, cookie});  %>
+    <%- include('partials/_header',{users, cookie}); %>
 
-    <main style="margin: 1em;">
+    <main style="margin: 1em">
       <h3>Login</h3>
       <form action="/login" method="POST">
         <div class="form-group">
           <label for="email">Email address</label>
-          <input type="email" name="email" class="form-control" aria-describedby="emailHelp" placeholder="Enter email">
+          <input
+            type="email"
+            name="email"
+            class="form-control"
+            aria-describedby="emailHelp"
+            placeholder="Enter email"
+          />
+          <small id="emailHelp" class="form-text text-muted"
+            >If you haven't registered yet, click on the 'Register' link in the above navbar.</small
+          >
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" name="password" class="form-control" placeholder="Password">
+          <input
+            type="password"
+            name="password"
+            class="form-control"
+            placeholder="Password"
+          />
         </div>
         <button type="submit" class="btn btn-primary">Login</button>
       </form>
