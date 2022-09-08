@@ -5,7 +5,11 @@ const app = express();
 
 // import helper functions
 const { generateID, getUserByEmail, urlsForUser } = require("./js/functions");
-const { errNotLoggedIn, errDoesNotExist, errDoesNotBelongToUser } = require("./js/errors");
+const {
+  errNotLoggedIn,
+  errDoesNotExist,
+  errDoesNotBelongToUser,
+} = require("./js/errors");
 
 const PORT = 8080; // default port 8080
 
@@ -71,11 +75,9 @@ app.get("/urls", (req, res) => {
   // error handling
   let cookie = req.cookies["user_id"];
   const { errMsgMain, errMsgSub, err } = errNotLoggedIn(cookie);
-  console.log('err: ',err)
-  if (err) cookie = '8asdfa';
-  
+
   // filter URLs specifically for logged in user
-  const userUrls = err ? {} : urlsForUser(cookie, urlDatabase);
+  const userUrls = urlsForUser(cookie, urlDatabase);
 
   const templateVars = {
     urls: userUrls,
@@ -83,8 +85,9 @@ app.get("/urls", (req, res) => {
     cookie,
     errMsgMain,
     errMsgSub,
-    err
+    err,
   };
+  if (err) return res.render("error", templateVars);
   res.render("urls_index", templateVars);
 });
 
@@ -120,17 +123,17 @@ app.post("/urls", (req, res) => {
 // CREATE NEW URL PAGE
 app.get("/urls/new", (req, res) => {
   // error handling
-  const cookie = req.cookies["user_id"];
+  let cookie = req.cookies["user_id"];
   const { errMsgMain, errMsgSub, err } = errNotLoggedIn(cookie);
-  if (err) return;
 
   const templateVars = {
     users,
     cookie,
     errMsgMain,
     errMsgSub,
-    err
+    err,
   };
+  if (err) return res.render("error", templateVars);
   res.render("urls_new", templateVars);
 });
 

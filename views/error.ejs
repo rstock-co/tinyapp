@@ -1,12 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-
     <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
@@ -14,44 +8,22 @@
       integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
       crossorigin="anonymous"
     />
-
-    <title>TinyApp</title>
+    <title>Error</title>
   </head>
 
   <body>
     <%- include('partials/_header',{users, cookie}); %>
-    
-    <main style="margin: 1em">
-      <h3>My URLs</h3>
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">Short URL ID</th>
-            <th scope="col">Long URL</th>
-            <th scope="col">Edit</th>
-            <th scope="col">Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% for (let id in urls) { %>
-          <tr>
-            <td><%= id %></td>
-            <td><%= urls[id].longURL %></td>
-            <td>
-              <form action="/urls/<%= id %>" method="GET">
-                <button type="submit">Edit</button>
-              </form>
-            </td>
-            <td>
-              <form action="/urls/<%= id %>/delete" method="POST">
-                <button type="submit">Delete</button>
-              </form>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <% } %>
-    </main>
+    <section class="generic-error">
+      <div class="card">
+        <h4 class="card-header">Error</h4>
+        <div class="card-body">
+          <blockquote class="blockquote mb-0">
+            <p><%= errMsgMain %></p>
+            <footer class="blockquote-footer"><%= errMsgSub %></footer>
+          </blockquote>
+        </div>
+      </div>
+    </section>
     <!-- Bootstrap JS -->
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
