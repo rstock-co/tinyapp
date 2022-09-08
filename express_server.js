@@ -63,13 +63,21 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 // manage cookies
-app.use(cookieSession());
+app.use(
+  cookieSession({
+    name: "session",
+    keys: ["user_id"],
+
+    // Cookie Options
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  })
+);
 
 // ---------- ROUTES & ENDPOINTS
 
 // GET: Homepage
 app.get("/", (req, res) => {
-  let cookie = req.cookies["user_id"];
+  let cookie = req.session.user_id;
   if (cookie) return res.redirect("/urls");
   res.redirect("/login");
 });
@@ -77,7 +85,7 @@ app.get("/", (req, res) => {
 // GET: `My URLS` page
 app.get("/urls", (req, res) => {
   // error handling
-  let cookie = req.cookies["user_id"];
+  let cookie = req.session.user_id;
   const errors = handleErrors({
     login: errNotLoggedIn(cookie),
   });
@@ -100,7 +108,7 @@ app.get("/urls", (req, res) => {
 // CRUD - [C]reate new URL
 app.post("/urls", (req, res) => {
   // error handling
-  let cookie = req.cookies["user_id"];
+  let cookie = req.session.user_id;
   const errors = handleErrors({
     login: errNotLoggedIn(cookie),
   });
@@ -124,7 +132,7 @@ app.post("/urls", (req, res) => {
 
 // GET: `NEW URL` page
 app.get("/urls/new", (req, res) => {
-  const cookie = req.cookies["user_id"];
+  const cookie = req.session.user_id;
 
   // check for errors
   const errors = handleErrors({
@@ -144,7 +152,7 @@ app.get("/urls/new", (req, res) => {
 
 // CRUD - [D]elete URL
 app.post("/urls/:id/delete", (req, res) => {
-  const cookie = req.cookies["user_id"];
+  const cookie = req.session.user_id;
   const id = req.params.id;
 
   // check for errors
@@ -160,19 +168,19 @@ app.post("/urls/:id/delete", (req, res) => {
     res.redirect("/urls");
   }
 
-  const templateVars = { 
+  const templateVars = {
     errors,
     users,
     id,
-    cookie
-   };
+    cookie,
+  };
 
   return res.render("error", templateVars);
 });
 
 // GET: Single URL details page
 app.get("/urls/:id", (req, res) => {
-  const cookie = req.cookies["user_id"];
+  const cookie = req.session.user_id;
   const id = req.params.id;
 
   const errors = handleErrors({
@@ -197,7 +205,7 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => {
-  const cookie = req.cookies["user_id"];
+  const cookie = req.session.user_id;
   const id = req.params.id;
 
   // check for errors
@@ -212,7 +220,7 @@ app.post("/urls/:id", (req, res) => {
       errors,
       users,
       id,
-      cookie
+      cookie,
     };
     return res.render("error", templateVars);
   }
@@ -241,7 +249,7 @@ app.get("/u/:id", (req, res) => {
 
 // USER REGISTRATION PAGE
 app.get("/register", (req, res) => {
-  const cookie = req.cookies["user_id"];
+  const cookie = req.session.user_id;
   if (cookie) {
     return res.redirect("/urls");
   }
@@ -276,13 +284,13 @@ app.post("/register", (req, res) => {
   console.log(users);
 
   // set a cookie for new user and then redirect
-  res.cookie("user_id", id);
+  req.session.user_id = id;
   res.redirect("/urls");
 });
 
 // USER LOGIN PAGE
 app.get("/login", (req, res) => {
-  const cookie = req.cookies["user_id"];
+  const cookie = req.session.user_id;
   if (cookie) {
     return res.redirect("/urls");
   }
@@ -313,7 +321,7 @@ app.post("/login", (req, res) => {
   }
 
   // upon successful login, set a cookie for user and then redirect
-  res.cookie("user_id", id);
+  req.session.user_id = id;
   res.redirect("/urls");
 });
 
