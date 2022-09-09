@@ -9,7 +9,7 @@ const { users } = require("../db");
 const { getUserByEmail } = require("../helpers/generic");
 
 // USER LOGIN PAGE
-router.get("/",(req, res) => {
+router.get("/", (req, res) => {
   const cookie = req.session.user_id;
   if (cookie) {
     return res.redirect("/urls");
@@ -21,7 +21,7 @@ router.get("/",(req, res) => {
   res.render("urls_login", templateVars);
 });
 
-router.post("/",(req, res) => {
+router.post("/", (req, res) => {
   const email = req.body.email;
   const formPass = req.body.password;
 
@@ -33,6 +33,8 @@ router.post("/",(req, res) => {
     return res.send("Error: Login not completed.");
   }
 
+  const password = userFound.password;
+  const id = userFound.id;
   if (!bcrypt.compareSync(formPass, password)) {
     res.status(403);
     return res.send("Error: Login not completed.");
