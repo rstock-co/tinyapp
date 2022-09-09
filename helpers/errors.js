@@ -5,7 +5,7 @@ const errNotLoggedIn = (cookie) => {
     return { error: false };
   }
 
-  const obj = {
+  return {
     errorTitle: "User Not Found",
     errorMessage: "You must be registered or logged in to perform this action.",
     buttons: ["Register", "Login"],
@@ -13,15 +13,6 @@ const errNotLoggedIn = (cookie) => {
     error: true,
   };
 
-  console.log('obj: ', obj)
-
-  return obj;
-
-  // return {
-  //   err,
-  //   errMsgMain: ,
-  //   errMsgSub: `Click on 'Login' or 'Register' link below.`,
-  // };
 };
 
 const errDoesNotExist = (id, database) => {
@@ -36,12 +27,6 @@ const errDoesNotExist = (id, database) => {
     hrefs: ["/urls/new"],
     error: true,
   };
-
-  // return {
-  //   err,
-  //   errMsgMain: "This URL does not exist.",
-  //   errMsgSub: `Click on 'Create New URL' to add new URLs to your profile.`,
-  // };
 };
 
 const errDoesNotBelongToUser = (id, cookie, database) => {
