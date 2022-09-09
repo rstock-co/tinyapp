@@ -5,14 +5,25 @@ TinyApp is a full stack web application built with Node and Express that allows 
 ## Extra Features
 
 - Error handling is more standardized and displays errors in a card with buttons below
-- ![Error Card](#https://github.com/rstock-co/tinyapp/blob/main/docs/error.png)
+![Error Card](https://github.com/rstock-co/tinyapp/blob/main/docs/error.png)
   
 - Routes have been separated into modules vs staying in the main server file
 
 ## Final Product
 
+### MyURLs Page
+- Displays all of the user's saved URL's
+
 ![My URLs Page](https://github.com/rstock-co/tinyapp/blob/main/docs/urls-page.png)
+
+### Edit URLs Page
+- Edit any URL and click on short URL to redirect to website
+  
 ![Edit URLs](https://github.com/rstock-co/tinyapp/blob/main/docs/edit-url.png)
+
+### Registration Page
+- Register to create private collection of short URL's
+- 
 ![Register](https://github.com/rstock-co/tinyapp/blob/main/docs/register.png)
 
 ## Dependencies
