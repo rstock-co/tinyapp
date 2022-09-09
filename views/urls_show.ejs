@@ -16,25 +16,33 @@
     <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
-        <h4 class="card-title"><b>TinyURL for: <%= longURL %></b></h4>
-        <p class="card-text">
+        <h4 class="card-title m-1 text-muted"><b>TinyURL for:</b></h4>
+        <h4 class="card-title mt-3"><b><%= longURL %></b></h4>
+        <p class="card-text mt-4">
           Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
         </p>
       </div>
 
-      <div class="card-footer text-muted">
+      <div class="card-footer">
         <div class="card text-center">
-          <h4 class="card-title"><b>Edit</b></h4>
-          <form action="/urls/<%= id %>" method="POST">
-            <label>New URL:</label>
-            <input
-              class="form-control"
-              type="text"
-              name="longURL"
-              placeholder="http://"
-              style="width: 300px; margin: 1em"
-            />
-            <button type="submit" class="btn btn-primary">Update</button>
+          <h4 class="card-title mt-3"><b>Edit</b></h4>
+          <form
+            class="form-inline"
+            action="/urls/<%= id %>"
+            method="POST"
+            style="display: flex; align-items: center; justify-content: center"
+          >
+            <div class="form-group mb-2">
+              <label for="longURL">Enter a URL:</label>
+              <input
+                class="form-control"
+                type="text"
+                name="longURL"
+                placeholder="http://"
+                style="width: 300px; margin: 1em"
+              />
+              <button type="submit" class="btn btn-primary">Update</button>
+            </div>
           </form>
         </div>
       </div>
