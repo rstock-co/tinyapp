@@ -55,8 +55,6 @@ router.post("/", (req, res) => {
       userID: cookie,
     };
 
-    console.log("Url DB from POST /urls module:", urlDatabase);
-
     // redirect to the 'urls/:id' route to display the new URL
     return res.redirect(`/urls/${id}`);
   }
@@ -64,7 +62,7 @@ router.post("/", (req, res) => {
   return res.render("error", templateVars);
 });
 
-// GET: `NEW URL` page
+// GET: `New URL` page
 router.get("/new", (req, res) => {
   const cookie = req.session.user_id;
 
@@ -85,7 +83,6 @@ router.get("/new", (req, res) => {
 });
 
 // GET: Single URL details page
-// CALLER: 'Edit' button on `My URLs` page
 router.get("/:id", (req, res) => {
   const cookie = req.session.user_id;
   const id = req.params.id;
@@ -103,15 +100,11 @@ router.get("/:id", (req, res) => {
     id,
   };
 
-  console.log("Url DB from urls-id module:", urlDatabase);
-  console.log("Errors from urls-id module:", errors);
-
   if (errors !== false) {
     return res.render("error", templateVars);
   }
 
   templateVars["longURL"] = urlDatabase[id].longURL;
-  console.log("Url DB from urls-id module:", urlDatabase);
   res.render("urls_show", templateVars);
 });
 
@@ -149,8 +142,6 @@ router.post("/:id", (req, res) => {
 router.post("/:id/delete", (req, res) => {
   const cookie = req.session.user_id;
   const id = req.params.id;
-
-  console.log("Url DB from del module:", urlDatabase);
 
   // check for errors
   const errors = handleErrors({

@@ -5,11 +5,7 @@ const { urlDatabase, users } = require("../db");
 
 // ---------- HELPER FUNCTIONS
 
-const {
-  errDoesNotExist,
-
-  handleErrors,
-} = require("../helpers/errors");
+const { errDoesNotExist, handleErrors } = require("../helpers/errors");
 
 // SHORT TO LONG URL REDIRECT PAGE
 router.get("/:id", (req, res) => {

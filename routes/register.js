@@ -42,8 +42,6 @@ router.post("/",(req, res) => {
   };
   users[id] = user;
 
-  console.log(users);
-
   // set a cookie for new user and then redirect
   req.session.user_id = id;
   res.redirect("/urls");

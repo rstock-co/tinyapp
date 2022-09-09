@@ -1,9 +1,5 @@
 const errNotLoggedIn = (cookie) => {
-  console.log('errNotLoggedIn ran')
-  if (cookie) {
-    console.log('From errNotLoggedIn: ', 'cookie found, user identified')
-    return { error: false };
-  }
+  if (cookie) return { error: false };
 
   return {
     errorTitle: "User Not Found",
@@ -16,7 +12,6 @@ const errNotLoggedIn = (cookie) => {
 };
 
 const errDoesNotExist = (id, database) => {
-  console.log('errDoesNotExist ran')
   if (database[id]) return { error: false };
 
   return {
@@ -30,7 +25,6 @@ const errDoesNotExist = (id, database) => {
 };
 
 const errDoesNotBelongToUser = (id, cookie, database) => {
-  console.log('errDoesNotBelongToUser ran')
   if (!database[id]) return { error: "does not exist" };
   if (database[id].userID === cookie) return { error: false };
   return {
