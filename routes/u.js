@@ -1,7 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
-const { urlDatabase } = require("../db");
+const { urlDatabase, users } = require("../db");
 
 // ---------- HELPER FUNCTIONS
 
@@ -13,6 +13,7 @@ const {
 
 // SHORT TO LONG URL REDIRECT PAGE
 router.get("/:id", (req, res) => {
+  let cookie = req.session.user_id;
   const id = req.params.id;
   const errors = handleErrors({
     exists: errDoesNotExist(id, urlDatabase),
@@ -21,7 +22,7 @@ router.get("/:id", (req, res) => {
     let longURL = urlDatabase[id].longURL;
     return res.redirect(longURL);
   }
-  const templateVars = { errors };
+  const templateVars = { errors, users, id, cookie };
   return res.render("error", templateVars);
 });
 
