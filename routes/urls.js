@@ -16,19 +16,19 @@ const {
 // GET: `My URLs` page
 router.get("/", (req, res) => {
   // error handling
-  let cookie = req.session.user_id;
+  let userID = req.session.user_id;
   const errors = handleErrors({
-    login: errNotLoggedIn(cookie),
+    login: errNotLoggedIn(userID),
   });
 
   // filter URLs specifically for logged in user
-  const userUrls = urlsForUser(cookie, urlDatabase);
+  const userUrls = urlsForUser(userID, urlDatabase);
 
   const templateVars = {
     errors,
     urls: userUrls,
     users,
-    cookie,
+    userID,
   };
   if (errors === false) {
     return res.render("urls_index", templateVars);
@@ -40,9 +40,9 @@ router.get("/", (req, res) => {
 // CALLER:  `Create` button on `urls_new` template
 router.post("/", (req, res) => {
   // error handling
-  let cookie = req.session.user_id;
+  let userID = req.session.user_id;
   const errors = handleErrors({
-    login: errNotLoggedIn(cookie),
+    login: errNotLoggedIn(userID),
   });
   const id = generateID(36, 6);
   if (errors === false) {
@@ -52,30 +52,30 @@ router.post("/", (req, res) => {
     // add the new URL to our database
     urlDatabase[id] = {
       longURL,
-      userID: cookie,
+      userID: userID,
     };
 
     // redirect to the 'urls/:id' route to display the new URL
     return res.redirect(`/urls/${id}`);
   }
-  const templateVars = { errors, users, id, cookie };
+  const templateVars = { errors, users, id, userID };
   return res.render("error", templateVars);
 });
 
 // GET: `New URL` page
 router.get("/new", (req, res) => {
-  const cookie = req.session.user_id;
+  const userID = req.session.user_id;
 
   // check for errors
   const errors = handleErrors({
-    login: errNotLoggedIn(cookie),
+    login: errNotLoggedIn(userID),
   });
 
   // if user isn't logged in, redirect to login page
   if (errors === false) {
     const templateVars = {
       users,
-      cookie,
+      userID,
     };
     return res.render("urls_new", templateVars);
   }
@@ -84,19 +84,19 @@ router.get("/new", (req, res) => {
 
 // GET: Single URL details page
 router.get("/:id", (req, res) => {
-  const cookie = req.session.user_id;
+  const userID = req.session.user_id;
   const id = req.params.id;
 
   const errors = handleErrors({
-    login: errNotLoggedIn(cookie),
+    login: errNotLoggedIn(userID),
     exists: errDoesNotExist(id, urlDatabase),
-    belongs: errDoesNotBelongToUser(id, cookie, urlDatabase),
+    belongs: errDoesNotBelongToUser(id, userID, urlDatabase),
   });
 
   const templateVars = {
     errors,
     users,
-    cookie,
+    userID,
     id,
   };
 
@@ -110,14 +110,14 @@ router.get("/:id", (req, res) => {
 
 // POST
 router.post("/:id", (req, res) => {
-  const cookie = req.session.user_id;
+  const userID = req.session.user_id;
   const id = req.params.id;
 
   // check for errors
   const errors = handleErrors({
-    login: errNotLoggedIn(cookie),
+    login: errNotLoggedIn(userID),
     exists: errDoesNotExist(id, urlDatabase),
-    belongs: errDoesNotBelongToUser(id, cookie, urlDatabase),
+    belongs: errDoesNotBelongToUser(id, userID, urlDatabase),
   });
 
   if (errors !== false) {
@@ -125,7 +125,7 @@ router.post("/:id", (req, res) => {
       errors,
       users,
       id,
-      cookie,
+      userID,
     };
     return res.render("error", templateVars);
   }
@@ -133,21 +133,21 @@ router.post("/:id", (req, res) => {
 
   urlDatabase[id] = {
     longURL,
-    userID: cookie,
+    userID: userID,
   };
   return res.redirect("/urls");
 });
 
 // CRUD - [D]elete URL
 router.post("/:id/delete", (req, res) => {
-  const cookie = req.session.user_id;
+  const userID = req.session.user_id;
   const id = req.params.id;
 
   // check for errors
   const errors = handleErrors({
-    login: errNotLoggedIn(cookie),
+    login: errNotLoggedIn(userID),
     exists: errDoesNotExist(id, urlDatabase),
-    belongs: errDoesNotBelongToUser(id, cookie, urlDatabase),
+    belongs: errDoesNotBelongToUser(id, userID, urlDatabase),
   });
 
   // if no errors, delete URL
@@ -160,7 +160,7 @@ router.post("/:id/delete", (req, res) => {
     errors,
     users,
     id,
-    cookie,
+    userID,
   };
 
   return res.render("error", templateVars);

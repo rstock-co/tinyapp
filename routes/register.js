@@ -10,13 +10,13 @@ const { generateID, getUserByEmail } = require("../helpers/generic");
 
 // USER REGISTRATION PAGE
 router.get("/",(req, res) => {
-  const cookie = req.session.user_id;
-  if (cookie) {
+  const userID = req.session.user_id;
+  if (userID) {
     return res.redirect("/urls");
   }
   const templateVars = {
     users,
-    cookie,
+    userID,
   };
   res.render("urls_register", templateVars);
 });
@@ -42,7 +42,7 @@ router.post("/",(req, res) => {
   };
   users[id] = user;
 
-  // set a cookie for new user and then redirect
+  // set a userID for new user and then redirect
   req.session.user_id = id;
   res.redirect("/urls");
 });

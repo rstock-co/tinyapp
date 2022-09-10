@@ -1,5 +1,5 @@
-const errNotLoggedIn = (cookie) => {
-  if (cookie) return { error: false };
+const errNotLoggedIn = (userID) => {
+  if (userID) return { error: false };
 
   return {
     errorTitle: "User Not Found",
@@ -24,9 +24,9 @@ const errDoesNotExist = (id, database) => {
   };
 };
 
-const errDoesNotBelongToUser = (id, cookie, database) => {
+const errDoesNotBelongToUser = (id, userID, database) => {
   if (!database[id]) return { error: "does not exist" };
-  if (database[id].userID === cookie) return { error: false };
+  if (database[id].userID === userID) return { error: false };
   return {
     errorTitle: "URL Does Not Belong To User",
     errorMessage:

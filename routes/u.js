@@ -9,7 +9,7 @@ const { errDoesNotExist, handleErrors } = require("../helpers/errors");
 
 // SHORT TO LONG URL REDIRECT PAGE
 router.get("/:id", (req, res) => {
-  let cookie = req.session.user_id;
+  let userID = req.session.user_id;
   const id = req.params.id;
   const errors = handleErrors({
     exists: errDoesNotExist(id, urlDatabase),
@@ -18,7 +18,7 @@ router.get("/:id", (req, res) => {
     let longURL = urlDatabase[id].longURL;
     return res.redirect(longURL);
   }
-  const templateVars = { errors, users, id, cookie };
+  const templateVars = { errors, users, id, userID };
   return res.render("error", templateVars);
 });
 

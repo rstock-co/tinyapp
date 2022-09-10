@@ -10,13 +10,13 @@ const { getUserByEmail } = require("../helpers/generic");
 
 // USER LOGIN PAGE
 router.get("/", (req, res) => {
-  const cookie = req.session.user_id;
-  if (cookie) {
+  const userID = req.session.user_id;
+  if (userID) {
     return res.redirect("/urls");
   }
   const templateVars = {
     users,
-    cookie,
+    userID,
   };
   res.render("urls_login", templateVars);
 });
@@ -40,7 +40,7 @@ router.post("/", (req, res) => {
     return res.send("Error: Login not completed.");
   }
 
-  // upon successful login, set a cookie for user and then redirect
+  // upon successful login, set a userID for user and then redirect
   req.session.user_id = id;
   res.redirect("/urls");
 });
