@@ -1,16 +1,10 @@
 const express = require("express");
 const router = express.Router();
+
 const { users, urlDatabase } = require("../db");
 
 const { generateID, urlsForUser, appendHttp } = require("../helpers/generic");
-
-const {
-  errNotLoggedIn,
-  errDoesNotExist,
-  errDoesNotBelongToUser,
-  handleErrors,
-} = require("../helpers/errors");
-
+const { errNotLoggedIn, handleErrors } = require("../helpers/errors");
 const { fullErrorHandler, loggedInErrorHandler } = require("../helpers/middleware.js")
 
 /**
@@ -22,16 +16,6 @@ const { fullErrorHandler, loggedInErrorHandler } = require("../helpers/middlewar
 router.get("/", loggedInErrorHandler, (req, res) => {
   const userID = req.session.user_id;
   const headerData = { users, userID };
-  // console.log("Header email from GET /urls: ",headerData)
-  // const errorObject = handleErrors({
-  //   login: errNotLoggedIn(userID),
-  // });
-
-  // const { isError } = errorObject;
-  // if (isError) {
-  //   errorObject.headerData = headerData;
-  //   return res.render("error", errorObject);
-  // }
 
   const templateVars = {
     urls: urlsForUser(userID, urlDatabase),
@@ -46,18 +30,8 @@ router.get("/", loggedInErrorHandler, (req, res) => {
  *  Displays error message if the user is not logged in.
  */
 
-router.post("/", (req, res) => {
+router.post("/", loggedInErrorHandler, (req, res) => {
   const userID = req.session.user_id;
-  const headerData = { users, userID };
-  const errorObject = handleErrors({
-    login: errNotLoggedIn(userID),
-  });
-
-  const { isError } = errorObject;
-  if (isError) {
-    errorObject.headerData = headerData;
-    return res.render("error", errorObject);
-  }
 
   const id = generateID(36, 6);
   const longURL = appendHttp(req.body.longURL);
@@ -95,21 +69,10 @@ router.get("/new", (req, res) => {
  *  Displays error message if the user is not logged in.
  */
 
-router.get("/:id", (req, res) => {
+router.get("/:id", fullErrorHandler, (req, res) => {
   const userID = req.session.user_id;
   const id = req.params.id;
   const headerData = { users, userID };
-  const errorObject = handleErrors({
-    login: errNotLoggedIn(userID),
-    exists: errDoesNotExist(id, urlDatabase),
-    belongs: errDoesNotBelongToUser(id, userID, urlDatabase),
-  });
-
-  const { isError } = errorObject;
-  if (isError) {
-    errorObject.headerData = headerData;
-    return res.render("error", errorObject);
-  }
 
   const templateVars = {
     headerData,
@@ -125,30 +88,9 @@ router.get("/:id", (req, res) => {
  *  Displays error message if user isn't logged in, URL doesn't exist, or URL doesn't belong to the user.
  */
 
-router.post("/:id", (req, res) => {
+router.post("/:id", fullErrorHandler, (req, res) => {
   const userID = req.session.user_id;
   const id = req.params.id;
-  const headerData = { users, userID };
-  const errorObject = handleErrors({
-    login: errNotLoggedIn(userID),
-    exists: errDoesNotExist(id, urlDatabase),
-    belongs: errDoesNotBelongToUser(id, userID, urlDatabase),
-  });
-
-  const { isError } = errorObject;
-  if (isError) {
-    errorObject.headerData = headerData;
-    return res.render("error", errorObject);
-  }
-
-  // if (errors !== false) {
-  //   const templateVars = {
-  //     errors,
-  //     users,
-  //     id,
-  //     userID,
-  //   };
-  //   return res.render("error", templateVars);
 
   const longURL = appendHttp(req.body.longURL);
   urlDatabase[id] = {
@@ -164,22 +106,8 @@ router.post("/:id", (req, res) => {
  *  Displays error message if user isn't logged in, URL doesn't exist, or URL doesn't belong to the user.
  */
 
-router.post("/:id/delete", (req, res) => {
-  const userID = req.session.user_id;
+router.post("/:id/delete", fullErrorHandler, (req, res) => {
   const id = req.params.id;
-  const headerData = { users, userID };
-  const errorObject = handleErrors({
-    login: errNotLoggedIn(userID),
-    exists: errDoesNotExist(id, urlDatabase),
-    belongs: errDoesNotBelongToUser(id, userID, urlDatabase),
-  });
-
-  const { isError } = errorObject;
-  if (isError) {
-    errorObject.headerData = headerData;
-    return res.render("error", errorObject);
-  }
-
   delete urlDatabase[id];
   res.redirect("/urls");
 
