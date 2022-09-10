@@ -4,8 +4,6 @@ const bcrypt = require("bcryptjs");
 const router = express.Router();
 const { users } = require("../db");
 
-// ---------- HELPER FUNCTIONS
-
 const { getUserByEmail } = require("../helpers/generic");
 
 // USER LOGIN PAGE
@@ -42,6 +40,11 @@ router.post("/", (req, res) => {
 
   // upon successful login, set a userID for user and then redirect
   req.session.user_id = id;
+  res.redirect("/urls");
+});
+
+router.post("/logout", (req, res) => {
+  req.session = null;
   res.redirect("/urls");
 });
 
