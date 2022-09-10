@@ -16,7 +16,7 @@ const {
 // GET: `My URLs` page
 router.get("/", (req, res) => {
   // error handling
-  let userID = req.session.user_id;
+  const userID = req.session.user_id;
   const errors = handleErrors({
     login: errNotLoggedIn(userID),
   });
@@ -40,7 +40,7 @@ router.get("/", (req, res) => {
 // CALLER:  `Create` button on `urls_new` template
 router.post("/", (req, res) => {
   // error handling
-  let userID = req.session.user_id;
+  const userID = req.session.user_id;
   const errors = handleErrors({
     login: errNotLoggedIn(userID),
   });
