@@ -1,4 +1,6 @@
-// ---------- DATA
+/**
+ * Database
+ */
 
 const users = {
     userRandomID: {

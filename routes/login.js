@@ -6,7 +6,10 @@ const { users } = require("../db");
 
 const { getUserByEmail } = require("../helpers/generic");
 
-// USER LOGIN PAGE
+/**
+ *  Renders the login page, and redirects to /urls if already logged in
+ */
+
 router.get("/", (req, res) => {
   const userID = req.session.user_id;
   if (userID) {
@@ -18,6 +21,10 @@ router.get("/", (req, res) => {
   };
   res.render("urls_login", templateVars);
 });
+
+/**
+ *  Logs the user in and creates a new cookie/session
+ */
 
 router.post("/", (req, res) => {
   const email = req.body.email;
@@ -38,10 +45,13 @@ router.post("/", (req, res) => {
     return res.send("Error: Login not completed.");
   }
 
-  // upon successful login, set a userID for user and then redirect
   req.session.user_id = id;
   res.redirect("/urls");
 });
+
+ /**
+ *  Logs the user out, ends the session and redirects to /urls
+ */
 
 router.post("/logout", (req, res) => {
   req.session = null;
