@@ -1,7 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
 const cookieSession = require("cookie-session");
-const bcrypt = require("bcryptjs");
 
 // ---------- IMPORTED ROUTES
 const loginRoute = require("./routes/login");
@@ -11,7 +10,7 @@ const urlsConvertRoute = require("./routes/u");
 
 // ---------- SETUP & MIDDLEWARE
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080; 
 app.set("view engine", "ejs");
 
 // parse POST request body
