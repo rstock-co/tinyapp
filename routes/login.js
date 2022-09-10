@@ -50,14 +50,4 @@ router.post("/", (req, res) => {
   res.redirect("/urls");
 });
 
- /**
- *  POST /logout
- *  Logs the user out, ends the session and redirects to /urls
- */
-
-router.post("/logout", (req, res) => {
-  req.session = null;
-  res.redirect("/urls");
-});
-
 module.exports = router;
