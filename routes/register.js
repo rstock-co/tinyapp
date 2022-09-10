@@ -4,11 +4,12 @@ const bcrypt = require("bcryptjs");
 const router = express.Router();
 const { users } = require("../db");
 
-// ---------- HELPER FUNCTIONS
-
 const { generateID, getUserByEmail } = require("../helpers/generic");
 
-// USER REGISTRATION PAGE
+/**
+ *  Renders registration page, redirects to /urls if already logged in
+ */
+
 router.get("/",(req, res) => {
   const userID = req.session.user_id;
   if (userID) {
@@ -21,6 +22,11 @@ router.get("/",(req, res) => {
   res.render("urls_register", templateVars);
 });
 
+/**
+ *  Registers the user, adds user to db, and creates a new cookie/session
+ *  Redirects to /urls upon completion
+ */
+
 router.post("/",(req, res) => {
   const id = generateID(36, 6);
   const email = req.body.email;
@@ -28,13 +34,11 @@ router.post("/",(req, res) => {
   const hashedPassword = bcrypt.hashSync(password, 10);
   const userFound = getUserByEmail(email, users);
 
-  // handle registration errors
   if (email === "" || password === "" || userFound) {
     res.status(400);
     return res.send("Error: Registration not completed.");
   }
 
-  // create object for new user then add to data store
   const user = {
     id,
     email,
@@ -42,7 +46,6 @@ router.post("/",(req, res) => {
   };
   users[id] = user;
 
-  // set a userID for new user and then redirect
   req.session.user_id = id;
   res.redirect("/urls");
 });
