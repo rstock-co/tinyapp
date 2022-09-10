@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const { urlDatabase, users } = require("../db");
 
-const { errDoesNotExist, handleErrors } = require("../helpers/errors");
+const { urlExistsErrorHandler } = require("../helpers/middleware.js")
 
 /**
  *  GET /u/:id
@@ -11,19 +11,8 @@ const { errDoesNotExist, handleErrors } = require("../helpers/errors");
  *  Displays error message if the given :id does not exist.
  */
 
-router.get("/:id", (req, res) => {
-  const userID = req.session.user_id;
+router.get("/:id", urlExistsErrorHandler, (req, res) => {
   const id = req.params.id;
-  const errorObject = handleErrors({
-    exists: errDoesNotExist(id, urlDatabase),
-  });
-  const { isError } = errorObject;
-
-  if (isError) {
-    const templateVars = { errorObject, users, id, userID };
-    return res.render("error", templateVars);
-  }
-
   const longURL = urlDatabase[id].longURL;
   return res.redirect(longURL);
 });
