@@ -1,9 +1,7 @@
 const express = require("express");
-
 const router = express.Router();
 const { users, urlDatabase } = require("../db");
 
-// ---------- HELPER FUNCTIONS
 const { generateID, urlsForUser, appendHttp } = require("../helpers/generic");
 
 const {
@@ -13,15 +11,18 @@ const {
   handleErrors,
 } = require("../helpers/errors");
 
-// GET: `My URLs` page
+/**
+ *  GET /urls
+ *  Renders the `MyURLs` table containing the users URLs
+ *  Displays error message if the user is not logged in
+ */
+
 router.get("/", (req, res) => {
-  // error handling
   const userID = req.session.user_id;
   const errors = handleErrors({
     login: errNotLoggedIn(userID),
   });
 
-  // filter URLs specifically for logged in user
   const userUrls = urlsForUser(userID, urlDatabase);
 
   const templateVars = {
@@ -36,42 +37,44 @@ router.get("/", (req, res) => {
   return res.render("error", templateVars);
 });
 
-// CRUD - [C]reate new URL
-// CALLER:  `Create` button on `urls_new` template
+/**
+ *  POST /urls
+ *  Adds a new URL to db, then redirects to /urls/:id to display the new URL's details
+ *  Displays error message if the user is not logged in
+ */
+
 router.post("/", (req, res) => {
-  // error handling
   const userID = req.session.user_id;
   const errors = handleErrors({
     login: errNotLoggedIn(userID),
   });
   const id = generateID(36, 6);
   if (errors === false) {
-    
     const longURL = appendHttp(req.body.longURL);
 
-    // add the new URL to our database
     urlDatabase[id] = {
       longURL,
       userID: userID,
     };
 
-    // redirect to the 'urls/:id' route to display the new URL
     return res.redirect(`/urls/${id}`);
   }
   const templateVars = { errors, users, id, userID };
   return res.render("error", templateVars);
 });
 
-// GET: `New URL` page
+/**
+ *  GET /urls/new
+ *  Renders page for user to create a new URL. 
+ *  Redirects to /login if the user is not logged in
+ */
+
 router.get("/new", (req, res) => {
   const userID = req.session.user_id;
-
-  // check for errors
   const errors = handleErrors({
     login: errNotLoggedIn(userID),
   });
 
-  // if user isn't logged in, redirect to login page
   if (errors === false) {
     const templateVars = {
       users,
@@ -82,7 +85,12 @@ router.get("/new", (req, res) => {
   return res.redirect("/login");
 });
 
-// GET: Single URL details page
+/**
+ *  GET /urls/:id
+ *  Adds a new URL to db, then redirects to /urls/:id to display the new URL's details
+ *  Displays error message if the user is not logged in
+ */
+
 router.get("/:id", (req, res) => {
   const userID = req.session.user_id;
   const id = req.params.id;
@@ -108,12 +116,16 @@ router.get("/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// POST
+/**
+ *  POST /urls/:id
+ *  Replaces an existing long URL in db, then redirects to /urls
+ *  Displays error message if user isn't logged in, URL doesn't exist, or URL doesn't belong to the user
+ */
+
 router.post("/:id", (req, res) => {
   const userID = req.session.user_id;
   const id = req.params.id;
 
-  // check for errors
   const errors = handleErrors({
     login: errNotLoggedIn(userID),
     exists: errDoesNotExist(id, urlDatabase),
@@ -138,7 +150,12 @@ router.post("/:id", (req, res) => {
   return res.redirect("/urls");
 });
 
-// CRUD - [D]elete URL
+/**
+ *  POST /urls/:id/delete
+ *  Deletes an existing URL from db, then redirects to /urls
+ *  Displays error message if user isn't logged in, URL doesn't exist, or URL doesn't belong to the user
+ */
+
 router.post("/:id/delete", (req, res) => {
   const userID = req.session.user_id;
   const id = req.params.id;

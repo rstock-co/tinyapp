@@ -7,6 +7,7 @@ const { users } = require("../db");
 const { generateID, getUserByEmail } = require("../helpers/generic");
 
 /**
+ *  GET /register
  *  Renders registration page, redirects to /urls if already logged in
  */
 
@@ -23,8 +24,9 @@ router.get("/",(req, res) => {
 });
 
 /**
- *  Registers the user, adds user to db, and creates a new cookie/session
- *  Redirects to /urls upon completion
+ *  POST /register
+ *  Checks if user already exists, validates email/password, then registers the new user by adding to db.
+ *  Creates a new cookie/session, then redirects to /urls
  */
 
 router.post("/",(req, res) => {

@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 /**
- *  Homepage: Redirects to /urls if already logged in, and /login if not
+ *  GET /
+ *  Redirects to /urls if already logged in, and /login if not
  */
 
 router.get("/", (req, res) => {

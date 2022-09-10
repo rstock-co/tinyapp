@@ -7,6 +7,7 @@ const { users } = require("../db");
 const { getUserByEmail } = require("../helpers/generic");
 
 /**
+ *  GET /login
  *  Renders the login page, and redirects to /urls if already logged in
  */
 
@@ -23,7 +24,9 @@ router.get("/", (req, res) => {
 });
 
 /**
- *  Logs the user in and creates a new cookie/session
+ *  POST /login
+ *  Checks if user already exists, checks password, then logs the user in.
+ *  Creates a new cookie/session
  */
 
 router.post("/", (req, res) => {
@@ -32,7 +35,6 @@ router.post("/", (req, res) => {
 
   const userFound = getUserByEmail(email, users);
 
-  // handle login errors
   if (!userFound) {
     res.status(403);
     return res.send("Error: Login not completed.");
@@ -50,6 +52,7 @@ router.post("/", (req, res) => {
 });
 
  /**
+ *  POST /logout
  *  Logs the user out, ends the session and redirects to /urls
  */
 
