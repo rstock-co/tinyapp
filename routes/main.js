@@ -3,7 +3,7 @@ const router = express.Router();
 
 /**
  *  GET /
- *  Redirects to /urls if already logged in, and /login if not
+ *  Redirects to /urls if already logged in, and /login if not.
  */
 
 router.get("/", (req, res) => {

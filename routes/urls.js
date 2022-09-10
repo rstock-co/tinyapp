@@ -13,8 +13,8 @@ const {
 
 /**
  *  GET /urls
- *  Renders the `MyURLs` table containing the users URLs
- *  Displays error message if the user is not logged in
+ *  Renders the `MyURLs` table containing the users URLs.
+ *  Displays error message if the user is not logged in.
  */
 
 router.get("/", (req, res) => {
@@ -39,8 +39,8 @@ router.get("/", (req, res) => {
 
 /**
  *  POST /urls
- *  Adds a new URL to db, then redirects to /urls/:id to display the new URL's details
- *  Displays error message if the user is not logged in
+ *  Adds a new URL to db, then redirects to /urls/:id to display the new URL's details.
+ *  Displays error message if the user is not logged in.
  */
 
 router.post("/", (req, res) => {
@@ -66,7 +66,7 @@ router.post("/", (req, res) => {
 /**
  *  GET /urls/new
  *  Renders page for user to create a new URL. 
- *  Redirects to /login if the user is not logged in
+ *  Redirects to /login if the user is not logged in.
  */
 
 router.get("/new", (req, res) => {
@@ -87,8 +87,8 @@ router.get("/new", (req, res) => {
 
 /**
  *  GET /urls/:id
- *  Adds a new URL to db, then redirects to /urls/:id to display the new URL's details
- *  Displays error message if the user is not logged in
+ *  Adds a new URL to db, then redirects to /urls/:id to display the new URL's details.
+ *  Displays error message if the user is not logged in.
  */
 
 router.get("/:id", (req, res) => {
@@ -118,8 +118,8 @@ router.get("/:id", (req, res) => {
 
 /**
  *  POST /urls/:id
- *  Replaces an existing long URL in db, then redirects to /urls
- *  Displays error message if user isn't logged in, URL doesn't exist, or URL doesn't belong to the user
+ *  Replaces an existing long URL in db, then redirects to /urls.
+ *  Displays error message if user isn't logged in, URL doesn't exist, or URL doesn't belong to the user.
  */
 
 router.post("/:id", (req, res) => {
@@ -152,22 +152,20 @@ router.post("/:id", (req, res) => {
 
 /**
  *  POST /urls/:id/delete
- *  Deletes an existing URL from db, then redirects to /urls
- *  Displays error message if user isn't logged in, URL doesn't exist, or URL doesn't belong to the user
+ *  Deletes an existing URL from db, then redirects to /urls.
+ *  Displays error message if user isn't logged in, URL doesn't exist, or URL doesn't belong to the user.
  */
 
 router.post("/:id/delete", (req, res) => {
   const userID = req.session.user_id;
   const id = req.params.id;
 
-  // check for errors
   const errors = handleErrors({
     login: errNotLoggedIn(userID),
     exists: errDoesNotExist(id, urlDatabase),
     belongs: errDoesNotBelongToUser(id, userID, urlDatabase),
   });
 
-  // if no errors, delete URL
   if (errors === false) {
     delete urlDatabase[id];
     res.redirect("/urls");

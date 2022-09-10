@@ -8,7 +8,7 @@ const { errDoesNotExist, handleErrors } = require("../helpers/errors");
 /**
  *  GET /u/:id
  *  Redirects to the longURL associated with the short URL :id
- *  Displays error message if the given :id does not exist 
+ *  Displays error message if the given :id does not exist.
  */
 
 router.get("/:id", (req, res) => {

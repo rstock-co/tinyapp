@@ -8,7 +8,7 @@ const { generateID, getUserByEmail } = require("../helpers/generic");
 
 /**
  *  GET /register
- *  Renders registration page, redirects to /urls if already logged in
+ *  Renders registration page, redirects to /urls if already logged in.
  */
 
 router.get("/",(req, res) => {

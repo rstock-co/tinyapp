@@ -26,7 +26,7 @@ router.get("/", (req, res) => {
 /**
  *  POST /login
  *  Checks if user already exists, checks password, then logs the user in.
- *  Creates a new cookie/session
+ *  Creates a new cookie/session.
  */
 
 router.post("/", (req, res) => {
