@@ -1,5 +1,7 @@
+const { users } = require("../db");
+
 const errNotLoggedIn = (userID) => {
-  const isError = true;
+  let isError = true;
   if (userID) isError = false;
 
   return {
@@ -7,13 +9,12 @@ const errNotLoggedIn = (userID) => {
     errorMessage: "You must be registered or logged in to perform this action.",
     buttons: ["Register", "Login"],
     hrefs: ["/register", "/login"],
-    error: isError,
+    isError,
   };
-
 };
 
 const errDoesNotExist = (id, database) => {
-  const isError = true;
+  let isError = true;
   if (database[id]) isError = false;
 
   return {
@@ -22,12 +23,12 @@ const errDoesNotExist = (id, database) => {
       "This URL does not exist in the database. To create a URL, click `Create URL` below:",
     buttons: ["Create URL"],
     hrefs: ["/urls/new"],
-    error: isError,
+    isError,
   };
 };
 
 const errDoesNotBelongToUser = (id, userID, database) => {
-  const isError = true;
+  let isError = true;
   if (database[id] && database[id].userID === userID) isError = false;
 
   return {
@@ -36,15 +37,19 @@ const errDoesNotBelongToUser = (id, userID, database) => {
       "This URL does not exist in your profile. To add a URL to your profile, click `Add URL` below:",
     buttons: ["Add URL"],
     hrefs: ["/urls/new"],
-    error: isError,
+    isError,
   };
 };
 
 const handleErrors = (errorObject) => {
-  for (err in errorObject) {
-    if (errorObject[err].error) return errorObject[err];
+  for (obj in errorObject) {
+    const error = errorObject[obj];
+    if (error.isError) {
+      console.log("Found error (from handler): ", error); // LOG
+      return error;
+    }
   }
-  return { error: false }
+  return { isError: false };
 };
 
 module.exports = {

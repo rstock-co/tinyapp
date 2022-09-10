@@ -19,22 +19,28 @@ const {
 
 router.get("/", (req, res) => {
   const userID = req.session.user_id;
-  const errors = handleErrors({
+  const headerData = {
+    users,
+    userID
+  }
+  const errorObject = handleErrors({
     login: errNotLoggedIn(userID),
   });
 
-  const userUrls = urlsForUser(userID, urlDatabase);
+  const { isError } = errorObject;
+
+  if (isError) {
+    errorObject.headerData = headerData;
+    console.log("Error object from server: ",errorObject) // LOG
+    return res.render("error", errorObject);
+  }
 
   const templateVars = {
-    errors,
-    urls: userUrls,
-    users,
-    userID,
+    urls: urlsForUser(userID, urlDatabase),
+    headerData
   };
-  if (errors === false) {
-    return res.render("urls_index", templateVars);
-  }
-  return res.render("error", templateVars);
+
+  return res.render("urls_index", templateVars);
 });
 
 /**
@@ -65,7 +71,7 @@ router.post("/", (req, res) => {
 
 /**
  *  GET /urls/new
- *  Renders page for user to create a new URL. 
+ *  Renders page for user to create a new URL.
  *  Redirects to /login if the user is not logged in.
  */
 

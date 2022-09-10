@@ -14,17 +14,18 @@ const { errDoesNotExist, handleErrors } = require("../helpers/errors");
 router.get("/:id", (req, res) => {
   const userID = req.session.user_id;
   const id = req.params.id;
-  const errors = handleErrors({
+  const errorObject = handleErrors({
     exists: errDoesNotExist(id, urlDatabase),
   });
+  const { isError } = errorObject;
 
-  if (errors === false) {
-    const longURL = urlDatabase[id].longURL;
-    return res.redirect(longURL);
+  if (isError) {
+    const templateVars = { errorObject, users, id, userID };
+    return res.render("error", templateVars);
   }
 
-  const templateVars = { errors, users, id, userID };
-  return res.render("error", templateVars);
+  const longURL = urlDatabase[id].longURL;
+  return res.redirect(longURL);
 });
 
 module.exports = router;

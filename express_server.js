@@ -23,7 +23,7 @@ app.use(cookieSession({
 );
 
 // Routes
-app.use("/main",mainRoute);
+app.use("/",mainRoute);
 app.use("/login",loginRoute);
 app.use("/register",registerRoute);
 app.use("/urls",urlsRoute);
