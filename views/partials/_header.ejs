@@ -18,10 +18,10 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
-      <%if (users.userID) { %>
+      <%if (users[userID]) { %>
       <div class="mr-3">
         <span class="navbar-text" style="color: black">
-          Logged in as: <%= users.userID.email %>
+          Logged in as: <%= users[userID].email %>
         </span>
       </div>
       <form action="/logout" method="POST">

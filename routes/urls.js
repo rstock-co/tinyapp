@@ -11,24 +11,27 @@ const {
   handleErrors,
 } = require("../helpers/errors");
 
+const { fullErrorHandler, loggedInErrorHandler } = require("../helpers/middleware.js")
+
 /**
  *  GET /urls
  *  Renders the `MyURLs` table containing the users URLs.
  *  Displays error message if the user is not logged in.
  */
 
-router.get("/", (req, res) => {
+router.get("/", loggedInErrorHandler, (req, res) => {
   const userID = req.session.user_id;
   const headerData = { users, userID };
-  const errorObject = handleErrors({
-    login: errNotLoggedIn(userID),
-  });
+  // console.log("Header email from GET /urls: ",headerData)
+  // const errorObject = handleErrors({
+  //   login: errNotLoggedIn(userID),
+  // });
 
-  const { isError } = errorObject;
-  if (isError) {
-    errorObject.headerData = headerData;
-    return res.render("error", errorObject);
-  }
+  // const { isError } = errorObject;
+  // if (isError) {
+  //   errorObject.headerData = headerData;
+  //   return res.render("error", errorObject);
+  // }
 
   const templateVars = {
     urls: urlsForUser(userID, urlDatabase),
