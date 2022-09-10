@@ -19,27 +19,21 @@ const {
 
 router.get("/", (req, res) => {
   const userID = req.session.user_id;
-  const headerData = {
-    users,
-    userID
-  }
+  const headerData = { users, userID };
   const errorObject = handleErrors({
     login: errNotLoggedIn(userID),
   });
 
   const { isError } = errorObject;
-
   if (isError) {
     errorObject.headerData = headerData;
-    console.log("Error object from server: ",errorObject) // LOG
     return res.render("error", errorObject);
   }
 
   const templateVars = {
     urls: urlsForUser(userID, urlDatabase),
-    headerData
+    headerData,
   };
-
   return res.render("urls_index", templateVars);
 });
 
@@ -51,22 +45,24 @@ router.get("/", (req, res) => {
 
 router.post("/", (req, res) => {
   const userID = req.session.user_id;
-  const errors = handleErrors({
+  const headerData = { users, userID };
+  const errorObject = handleErrors({
     login: errNotLoggedIn(userID),
   });
-  const id = generateID(36, 6);
-  if (errors === false) {
-    const longURL = appendHttp(req.body.longURL);
 
-    urlDatabase[id] = {
-      longURL,
-      userID: userID,
-    };
-
-    return res.redirect(`/urls/${id}`);
+  const { isError } = errorObject;
+  if (isError) {
+    errorObject.headerData = headerData;
+    return res.render("error", errorObject);
   }
-  const templateVars = { errors, users, id, userID };
-  return res.render("error", templateVars);
+
+  const id = generateID(36, 6);
+  const longURL = appendHttp(req.body.longURL);
+  urlDatabase[id] = {
+    longURL,
+    userID: userID,
+  };
+  return res.redirect(`/urls/${id}`);
 });
 
 /**
@@ -77,18 +73,17 @@ router.post("/", (req, res) => {
 
 router.get("/new", (req, res) => {
   const userID = req.session.user_id;
-  const errors = handleErrors({
+  const errorObject = handleErrors({
     login: errNotLoggedIn(userID),
   });
 
-  if (errors === false) {
-    const templateVars = {
-      users,
-      userID,
-    };
-    return res.render("urls_new", templateVars);
-  }
-  return res.redirect("/login");
+  const { isError } = errorObject;
+  if (isError) return res.redirect("/login");
+
+  const templateVars = {
+    headerData: { users, userID },
+  };
+  return res.render("urls_new", templateVars);
 });
 
 /**
@@ -100,25 +95,24 @@ router.get("/new", (req, res) => {
 router.get("/:id", (req, res) => {
   const userID = req.session.user_id;
   const id = req.params.id;
-
-  const errors = handleErrors({
+  const headerData = { users, userID };
+  const errorObject = handleErrors({
     login: errNotLoggedIn(userID),
     exists: errDoesNotExist(id, urlDatabase),
     belongs: errDoesNotBelongToUser(id, userID, urlDatabase),
   });
 
-  const templateVars = {
-    errors,
-    users,
-    userID,
-    id,
-  };
-
-  if (errors !== false) {
-    return res.render("error", templateVars);
+  const { isError } = errorObject;
+  if (isError) {
+    errorObject.headerData = headerData;
+    return res.render("error", errorObject);
   }
 
-  templateVars["longURL"] = urlDatabase[id].longURL;
+  const templateVars = {
+    headerData,
+    id,
+    longURL: urlDatabase[id].longURL,
+  };
   res.render("urls_show", templateVars);
 });
 
@@ -131,24 +125,29 @@ router.get("/:id", (req, res) => {
 router.post("/:id", (req, res) => {
   const userID = req.session.user_id;
   const id = req.params.id;
-
-  const errors = handleErrors({
+  const headerData = { users, userID };
+  const errorObject = handleErrors({
     login: errNotLoggedIn(userID),
     exists: errDoesNotExist(id, urlDatabase),
     belongs: errDoesNotBelongToUser(id, userID, urlDatabase),
   });
 
-  if (errors !== false) {
-    const templateVars = {
-      errors,
-      users,
-      id,
-      userID,
-    };
-    return res.render("error", templateVars);
+  const { isError } = errorObject;
+  if (isError) {
+    errorObject.headerData = headerData;
+    return res.render("error", errorObject);
   }
-  const longURL = appendHttp(req.body.longURL);
 
+  // if (errors !== false) {
+  //   const templateVars = {
+  //     errors,
+  //     users,
+  //     id,
+  //     userID,
+  //   };
+  //   return res.render("error", templateVars);
+
+  const longURL = appendHttp(req.body.longURL);
   urlDatabase[id] = {
     longURL,
     userID: userID,
@@ -165,26 +164,30 @@ router.post("/:id", (req, res) => {
 router.post("/:id/delete", (req, res) => {
   const userID = req.session.user_id;
   const id = req.params.id;
-
-  const errors = handleErrors({
+  const headerData = { users, userID };
+  const errorObject = handleErrors({
     login: errNotLoggedIn(userID),
     exists: errDoesNotExist(id, urlDatabase),
     belongs: errDoesNotBelongToUser(id, userID, urlDatabase),
   });
 
-  if (errors === false) {
-    delete urlDatabase[id];
-    res.redirect("/urls");
+  const { isError } = errorObject;
+  if (isError) {
+    errorObject.headerData = headerData;
+    return res.render("error", errorObject);
   }
 
-  const templateVars = {
-    errors,
-    users,
-    id,
-    userID,
-  };
+  delete urlDatabase[id];
+  res.redirect("/urls");
 
-  return res.render("error", templateVars);
+  // const templateVars = {
+  //   errors,
+  //   users,
+  //   id,
+  //   userID,
+  // };
+
+  // return res.render("error", templateVars);
 });
 
 module.exports = router;

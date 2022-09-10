@@ -17,8 +17,7 @@ router.get("/",(req, res) => {
     return res.redirect("/urls");
   }
   const templateVars = {
-    users,
-    userID,
+    headerData: {users, userID}
   };
   res.render("urls_register", templateVars);
 });
