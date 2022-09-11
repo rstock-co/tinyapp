@@ -24,7 +24,6 @@ router.get("/:id", urlExistsErrorHandler, (req, res) => {
     urls.uniqueVisits = urls.visitors.length;
   }
 
-  console.log(urls);
   const longURL = urls.longURL;
   return res.redirect(longURL);
 });

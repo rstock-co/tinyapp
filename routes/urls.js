@@ -21,7 +21,6 @@ router.get("/", loggedInErrorHandler, (req, res) => {
     urls: urlsForUser(userID, urlDatabase),
     headerData,
   };
-  console.log(templateVars.urls)
   return res.render("urls_index", templateVars);
 });
 
@@ -44,7 +43,6 @@ router.post("/", loggedInErrorHandler, (req, res) => {
     visitors: [],
     dateCreated: convertTodayToString(),
   };
-  console.log(urlDatabase)
   return res.redirect(`/urls/${id}`);
 });
 

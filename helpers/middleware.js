@@ -8,7 +8,6 @@ const {
 } = require("../helpers/errors");
 
 const fullErrorHandler = (req, res, next) => {
-  console.log("Full Error Handler middleware executed");
   const userID = req.session.user_id;
   const id = req.params.id;
   const headerData = { users, userID };
@@ -28,7 +27,6 @@ const fullErrorHandler = (req, res, next) => {
 };
 
 const loggedInErrorHandler = (req, res, next) => {
-  console.log("loggedIn Error Handler middleware executed");
   const userID = req.session.user_id;
   const headerData = { users, userID };
   const errorObject = handleErrors({
@@ -44,7 +42,6 @@ const loggedInErrorHandler = (req, res, next) => {
 };
 
 const urlExistsErrorHandler = (req, res, next) => {
-  console.log("urlExists Error Handler middleware executed");
   const userID = req.session.user_id;
   const id = req.params.id;
   const headerData = { users, userID };

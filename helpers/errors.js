@@ -1,7 +1,6 @@
 const { users } = require("../db");
 
 const errNotLoggedIn = (userID) => {
-  console.log("errNotLoggedIn function executed: ", userID); 
   let isError = true;
   if (userID) isError = false;
 
@@ -46,7 +45,6 @@ const handleErrors = (errorObject) => {
   for (obj in errorObject) {
     const error = errorObject[obj];
     if (error.isError) {
-      console.log("Found error (from handler): ", error); // LOG
       return error;
     }
   }
