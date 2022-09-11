@@ -9,6 +9,8 @@ TinyApp is a full stack web application built with Node and Express that allows 
   
 - Routes and source data have been separated into modules vs staying in the main server file
 
+- Added analytics to track total and unique visits for each URL (stretch goal)
+
 ## Final Product
 
 ### MyURLs Page
