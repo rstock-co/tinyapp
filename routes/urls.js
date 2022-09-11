@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { users, urlDatabase } = require("../db");
 
-const { generateID, urlsForUser, appendHttp } = require("../helpers/generic");
+const { generateID, urlsForUser, appendHttp, convertTodayToString } = require("../helpers/generic");
 const { errNotLoggedIn, handleErrors } = require("../helpers/errors");
 const { fullErrorHandler, loggedInErrorHandler } = require("../helpers/middleware.js")
 
@@ -21,6 +21,7 @@ router.get("/", loggedInErrorHandler, (req, res) => {
     urls: urlsForUser(userID, urlDatabase),
     headerData,
   };
+  console.log(templateVars.urls)
   return res.render("urls_index", templateVars);
 });
 
@@ -38,7 +39,12 @@ router.post("/", loggedInErrorHandler, (req, res) => {
   urlDatabase[id] = {
     longURL,
     userID: userID,
+    totalVisits: 0,
+    uniqueVisits: 0,
+    visitors: [],
+    dateCreated: convertTodayToString(),
   };
+  console.log(urlDatabase)
   return res.redirect(`/urls/${id}`);
 });
 
