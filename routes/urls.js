@@ -114,15 +114,6 @@ router.post("/:id/delete", fullErrorHandler, (req, res) => {
   const id = req.params.id;
   delete urlDatabase[id];
   res.redirect("/urls");
-
-  // const templateVars = {
-  //   errors,
-  //   users,
-  //   id,
-  //   userID,
-  // };
-
-  // return res.render("error", templateVars);
 });
 
 module.exports = router;

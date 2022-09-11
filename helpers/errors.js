@@ -1,5 +1,3 @@
-const { users } = require("../db");
-
 const errNotLoggedIn = (userID) => {
   let isError = true;
   if (userID) isError = false;
