@@ -1,6 +1,11 @@
+<!-- My image:  https://ibb.co/F7qk0N7 -->
+
 <header>
-  <nav class="navbar navbar-expand-lg navbar-light bg-success">
-    <a class="navbar-brand" href="/urls">TinyApp</a>
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+    <a class="navbar-brand" href="#">
+      <img src="https://i.ibb.co/r5nhd84/ta4.png" alt="ta2" width="62" height="40"> 
+      <i><b>TinyApp</b></i>
+  </a>
     <button
       class="navbar-toggler"
       type="button"
@@ -12,21 +17,28 @@
     >
       <span class="navbar-toggler-icon"></span>
     </button>
-
+    <%if (users[userID]) { %>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav mr-auto">
-        <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+        <a class="nav-item nav-link ml-3" style="color: white" href="/urls">My URLs</a>
+        <!-- (if statment)-->
+        <a class="nav-item nav-link ml-3" style="color: white" href="/urls/new">Create New URL:</a>
+        <form action="/urls" method="POST">
+          <div class="form-white input-group" style="width: 250px;">
+            <input type="text" name="longURL" class="form-control rounded" placeholder="https://"
+              aria-label="Search" aria-describedby="search-addon" />
+          </div>
+        </form>
       </div>
-      <%if (users[userID]) { %>
+      <!-- (if statment)-->
       <div class="mr-3">
-        <span class="navbar-text" style="color: black">
-          Logged in as: <%= users[userID].email %>
+        <span class="navbar-text" style="color: white; font-size: 19px;">
+          <b><%= users[userID].email %></b>
         </span>
       </div>
       <form action="/logout" method="POST">
-        <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">
-          Logout
+        <button class="btn btn-dark my-2 my-sm-0" type="submit">
+       Logout
         </button>
       </form>
       <% } else { %>

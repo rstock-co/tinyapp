@@ -14,6 +14,11 @@
       integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
       crossorigin="anonymous"
     />
+    <style>
+      .navbar-custom {
+            background-color: #07080A;
+        }
+    </style>
 
     <title>TinyApp</title>
   </head>
@@ -38,19 +43,19 @@
         <tbody>
           <% for (let id in urls) { %>
           <tr>
-            <td><a href="/u/<%= id %>"><%= id %></a></td>
+            <td style="text-decoration:underline;"><a href="/u/<%= id %>"><%= id %></a></td>
             <td><%= urls[id].longURL %></td>
             <td><%= urls[id].dateCreated %></td>
             <td><%= urls[id].totalVisits %></td>
             <td><%= urls[id].uniqueVisits %></td>
             <td>
               <form action="/urls/<%= id %>" method="GET">
-                <button type="submit" class="btn btn-primary">Edit</button>
+                <button type="submit" class="btn btn-secondary">Edit</button>
               </form>
             </td>
             <td>
               <form action="/urls/<%= id %>/delete" method="POST">
-                <button type="submit" class="btn btn-primary">Delete</button>
+                <button type="submit" class="btn btn-danger">Delete</button>
               </form>
             </td>
           </tr>

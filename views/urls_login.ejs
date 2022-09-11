@@ -17,6 +17,11 @@
 
     <title>Login - TinyApp</title>
   </head>
+  <style>
+    .navbar-custom {
+          background-color: #07080A;
+      }
+  </style>
 
   <body>
     <%- include('partials/_header', headerData); %>
@@ -24,7 +29,7 @@
     <main style="margin: 1em">
       <h3>Login</h3>
       <form action="/login" method="POST">
-        <div class="form-group">
+        <div class="form-group w-25">
           <label for="email">Email address</label>
           <input
             type="email"
@@ -37,7 +42,7 @@
             >If you haven't registered yet, click on the 'Register' link in the above navbar.</small
           >
         </div>
-        <div class="form-group">
+        <div class="form-group w-25">
           <label for="password">Password</label>
           <input
             type="password"
