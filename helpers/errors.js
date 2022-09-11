@@ -1,6 +1,7 @@
 const { users } = require("../db");
 
 const errNotLoggedIn = (userID) => {
+  console.log("errNotLoggedIn function executed: ", userID); 
   let isError = true;
   if (userID) isError = false;
 

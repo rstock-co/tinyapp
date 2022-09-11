@@ -46,6 +46,7 @@ router.post("/",(req, res) => {
     password: hashedPassword,
   };
   users[id] = user;
+  console.log(users) // LOG
 
   req.session.user_id = id;
   res.redirect("/urls");

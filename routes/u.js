@@ -1,7 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
-const { urlDatabase, users } = require("../db");
+const { urlDatabase } = require("../db");
 
 const { urlExistsErrorHandler } = require("../helpers/middleware.js")
 

@@ -6,7 +6,7 @@ const router = express.Router();
  *  Logs the user out, ends the session and redirects to /urls
  */
 
-router.post("/logout", (req, res) => {
+router.post("/", (req, res) => {
   req.session = null;
   res.redirect("/urls");
 });

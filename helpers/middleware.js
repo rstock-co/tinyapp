@@ -7,14 +7,6 @@ const {
   handleErrors,
 } = require("../helpers/errors");
 
-const renderErrorMsg = (res, errorObject, isError, headerData) => {
-  if (isError) {
-    errorObject.headerData = headerData;
-    return res.render("error", errorObject);
-    next();
-  }
-};
-
 const fullErrorHandler = (req, res, next) => {
   console.log("Full Error Handler middleware executed");
   const userID = req.session.user_id;
@@ -27,7 +19,11 @@ const fullErrorHandler = (req, res, next) => {
   });
 
   const { isError } = errorObject;
-  renderErrorMsg(res, errorObject, isError, headerData);
+  if (isError) {
+    errorObject.headerData = headerData;
+    return res.render("error", errorObject);
+    next();
+  }
   next();
 };
 
@@ -40,7 +36,10 @@ const loggedInErrorHandler = (req, res, next) => {
   });
 
   const { isError } = errorObject;
-  renderErrorMsg(res, errorObject, isError, headerData);
+  if (isError) {
+    errorObject.headerData = headerData;
+    return res.render("error", errorObject);
+  }
   next();
 };
 
@@ -52,9 +51,13 @@ const urlExistsErrorHandler = (req, res, next) => {
   const errorObject = handleErrors({
     exists: errDoesNotExist(id, urlDatabase),
   });
-
   const { isError } = errorObject;
-  renderErrorMsg(res, errorObject, isError, headerData);
+
+  if (isError) {
+    errorObject.headerData = headerData;
+    return res.render("error", errorObject);
+    next();
+  }
   next();
 };
 
